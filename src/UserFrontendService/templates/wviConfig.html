@@ -1,0 +1,28 @@
+{% extends 'navigation.html'%}
+{% block title%} Content score definition {% endblock %}
+{% block body %}
+
+
+<h5>Code für die Website-Besuchererkennung</h5>
+<p>Bitte folgenden Javascript Code auf der Seite integrieren, deren Besucher erkannt werden sollen.</p>
+<pre><code class="language-html" id="track_code">&lt;script type="text/javascript"&gt;
+var jss = document.getElementsByTagName("script");
+for (var j = jss.length; j >= 0; j--) {
+    if (jss[j]) {
+        if (jss[j].getAttribute("src") && jss[j].getAttribute("src").indexOf("api.truffle.one/static/getWebData.js") != -1) {
+            jss[j].parentNode.removeChild(jss[j]);
+        }
+    }
+}
+var t1_params = t1_params || [];
+t1_params.push({{customerId}});
+var t = document["createElement"]("script"), i;
+t["type"] = "text/javascript";
+t["src"] = window["location"]["href"]["split"]("/")[0] + "//api.truffle.one/static/getWebData.js";
+i = document["getElementsByTagName"]("script")[0];
+i["parentNode"]["insertBefore"](t, i);
+&lt;/script&gt;</code></pre>
+
+<h5>Mustertext für die Datenschutzerklärung</h5>
+<textarea class="form-control" id="privacyText" rows="6">Auf unsere Website nutzen wir die Webtechnologie Unternehmenerkennung der truffle.one GmbH, Am Weißen Stein 16, 53227 Bonn, Germany („truffle.one“), um Unternehmen als Webseitenbesucher zu identifizieren. Bei einem Besuch unserer Seite findet ein Abgleich Ihrer IP-Adresse statt, um festzustellen, ob Sie als Webseitenbesucher von einer statischen, also einer festen Firmen IP-Adresse kommen. Aus dieser wird der Domainname und der Name des Unternehmens abgeleitet. Dabei können wir feststellen, wie lange sich Besucher unserer Website auf einer unserer Webseiten aufgehalten haben. Ein Personenzug ist uns dabei nicht möglich. Wir können Sie lediglich als Besucher der Website zuordnen, der von der statischen IP-Adresse gekommen ist. Die IP-Adresse wird daraufhin verworfen. Wir nutzen die Informationen, um Ihre Nutzung unserer Website auszuwerten, um Reports über die Websiteaktivitäten für uns zusammenzustellen und Verbesserungen unseres Marketings und unserer werblichen Ansprache zu erzielen. Rechtsgrundlage der Datenverarbeitung ist Ihre Einwilligung nach Art. 6 Abs. 1 a) DSGVO.</textarea>
+{% endblock %}

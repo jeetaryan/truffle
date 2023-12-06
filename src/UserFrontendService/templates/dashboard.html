@@ -1,0 +1,501 @@
+{% extends 'navigation.html'%}
+{% block title%} truffle.one ABM {% endblock %}
+
+{% block body %}
+<div id="tblbuttons"></div>
+<style>
+    .btn_website{
+        border:2px solid red;
+        text-decoration:none;
+        color:#fff;
+
+    }
+    .btn_website:hover{
+        text-decoration:none;
+        color:#fff;
+    }
+
+    .btn_website:focus{
+        text-decoration:none;
+        color:#fff;
+    }
+
+
+
+
+</style>
+<div class="row" id="selectedCompaniesInfo"></div>
+<div class="row" >
+    <div class="col-md-2">
+        <select id="addToSegmentDropdown" class="form-control" required="required"></select>
+    </div>
+    <div class="col-md-2">
+        <select id="removeFromSegmentDropdown" class="form-control" required="required"></select>
+    </div>
+    <!--
+    <div class="col-md-2">
+        <button type="submit" id="deleteCompaniesButton" class="btn-save" style="border:2px solid #ce0058;">Löschen</button>
+    </div>
+-->
+</div>
+<table id="dashboard" class="t1table table nowrap">
+    <thead>
+    <tr>
+        <th>
+            <input type="checkbox" id="select_current" title="Select all companies on this page">
+            <input type="checkbox" id="select_all" title="Select all companies on all pages">
+        </th>
+        <th></th>
+        <th>Unternehmen</th>
+        <th>Info</th>
+        <th>Segment</th>
+        <th>Source</th>
+        <th>Letztes Update</th>
+        <th>Branche</th>
+        <th>Mitarbeiter min.</th>
+        <th>Mitarbeiter max.</th>
+        <th>Umsatz min.</th>
+        <th>Umsatz max.</th>
+        <th>Content score</th>
+        <th>Kontakte</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in data %}
+
+
+    <tr id="company_row_{{item[9]}}">
+        <td><input type="checkbox" class="companySelection" value="{{item[9]}}"></td>
+        <td id="{{item[9]}}logo">{%if item[8] is not none %}
+            <div class="companyLogoWrapper"><img class="companylogo"
+                                                 src=https://login.truffle.one/static/companylogos/{{item[9]}}.{{item[8]}}>
+            </div>
+            {% endif %}
+        </td>
+
+        <td id="{{item[9]}}companyname">{%if item[12] is none %}
+            {{item[0]}}
+            {% else %}
+            {%if item[10] is not none %}
+            <div class="tooltip2"><a href=https://{{item[12]}} target=new>{{item[0]}}</a>
+                <div class="tooltiptext2"><img src=https://login.truffle.one/static/screenshots/{{item[11]}}.png
+                                               width=320px></div>
+            </div>
+            {% else %}
+            <a href=https://{{item[12]}} target=new>{{item[0]}}</a>
+            {% endif %}
+            {% endif %}
+        </td>
+        <td><a href="/company/{{item[9]}}/factsheet" target="new"><i class="fa fa-info"></i></a></td>
+
+        <td>
+            <a href="#" onclick="showSegments({{item[9]}})" id='{{item[9]}}segment'>
+                <canvas width="50px" height="25px" id="segmentCode_{{item[9]}}" class="t1segmentCode"></canvas>
+            </a>
+        </td>
+        <td>
+            <a href="#" onclick="showSources({{item[9]}})" id='{{item[14]}}source'>
+                <canvas width="50px" height="25px" id="sourceCode_{{item[9]}}" class="t1sourceCode"></canvas>
+            </a>
+        </td>
+        <td id="{{item[9]}}lastupdate" class="details-control">
+            {% if item[1] is not none %}{{item[1]}}
+            <button id='{{item[9]}}visits' class="userinfo btnShow"
+                    onclick="visitDetails('{{item[9]}}')">+
+            </button>
+            {% else %}kein Besuch
+            <button id='{{item[9]}}visits' class="userinfo btnShow hidden"
+                    onclick="visitDetails('{{item[9]}}')">+
+            </button>
+            {% endif %}
+        </td>
+        <td id="{{item[9]}}industry">
+            {% if item[3] is not none %}
+            {{item[3]}}
+            {% else %}
+            {{item[15]}}
+            {% endif %}
+        </td>
+        <td id="{{item[9]}}emp0">{% if item[4] is not none %}
+            {{ "{0:,}".format(item[4]) }}
+            {% else %}
+            {{item[4]}}
+            {%endif %}
+        </td>
+        <td id="{{item[9]}}emp1">{% if item[5] is not none %}
+            {{ "{0:,}".format(item[5]) }}
+            {% else %}
+            {{item[5]}}
+            {%endif %}
+        </td>
+        <td id="{{item[9]}}rev0">{% if item[6] is not none %}
+            {{ "{0:,}".format(item[6]) }}
+            {% else %}
+            {{item[6]}}
+            {%endif %}
+        </td>
+        <td id="{{item[9]}}rev1">{% if item[7] is not none %}
+            {{ "{0:,}".format(item[7]) }}
+            {% else %}
+            {{item[7]}}
+            {%endif %}
+        </td>
+
+        <td id="contentScore" class="details-control">
+            <button id='{{item[9]}}contentScore' class="userinfo btnShow"
+                    onclick="contentScore('{{item[9]}}')">Content score
+            </button>
+        </td>
+
+
+        <td id="contacts" class="details-control">
+            {% if item[13] is not none %}
+            <button id='{{item[9]}}contacts' class="userinfo btnShow"
+                    onclick="visitContact('{{item[9]}}')">{{item[13]}} Kontakte
+            </button>
+            {% else %}
+            <button class="userinfo btnShow" style="background-color:grey;">
+                keine
+            </button>
+            {% endif %}
+        </td>
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+</table>
+{% if data|length > 0 %}
+
+{% else %}
+<tr>
+    <td></td>
+    <td></td>
+    <td colspan="8">
+        <center>
+            <p>Sie haben noch keine Target-Accounts.<br>Erwägen Sie, die Website-Besuchererkennung zu aktivieren.</p>
+            <a href="#myModal" class="btn btn_website" data-toggle="modal" data-target="#myModal">Website-Besuchererkennung</a>
+        </center>
+    </td>
+</tr>
+{% endif %}
+
+
+<script type="text/javascript">
+$("#dashboard_info").ready( function () {
+    $('#loaderBg').hide();
+    $('#loaderContainer').hide();
+  });
+
+$(document).ready(function() {
+    var table = $('#dashboard').DataTable( {
+      dom: 'lBftip',
+      responsive: false,
+	  "thousands": ".",
+	  "decimals": ",",
+	  "drawCallback": function( settings ) {
+        loadSegments();
+        loadSources();
+      },
+	  "columnDefs": [
+	    { "orderable": false, "targets": [0,1,3,4,5] },
+	    { "className": 'dt-body-right', "targets": [8,9,10,11]},
+	    { render: $.fn.dataTable.render.ellipsis( 20 ), targets: [7]}
+	  ],
+	  colReorder: true,
+	  order: [[6, 'desc']],
+	  "language": {
+	    "thousands": ".",
+	    "decimals": ","
+	  },
+	  buttons: [
+		    'copy',
+		    {
+                extend: 'excelHtml5',
+                title: 'truffle.one'
+            },
+            'colvis',
+            {
+	            extend: 'searchBuilder',
+	            config: {
+	                text: "complex search"
+	            }
+            }
+      ]
+    } );
+
+    new $.fn.dataTable.FixedHeader( table );
+} );
+
+function visitDetails(x) {
+
+        let companyId = x;
+        let btn_clicked = document.getElementById(companyId+"visits");
+        //console.log("companyId =" + companyId);
+        idBtn = event.srcElement.id
+        let get_data=document.getElementById('row'+idBtn)
+        //console.log("idBtn = " + idBtn);
+        let get_class_name=document.querySelectorAll('.addlRow')
+        var tableId="#visits"+companyId;
+
+        if(!get_data){
+
+            $.ajax({
+            url:'/visitDetails',
+            type:'post',
+            data:{ companyId: companyId },
+            success:function(data){
+                for(let i=0;i<get_class_name.length;i++){
+                    get_class_name[i].remove()
+                }
+
+                var tr_referred = btn_clicked.parentNode.parentNode;
+                var td = document.createElement('td');
+                td.innerHTML = data.htmlresponse;
+                var tr = document.createElement('tr');
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(td).setAttribute("colspan", "10");
+                tr.appendChild(td).setAttribute("class", "lastChild");
+                tr.setAttribute("Id", 'row'+idBtn);
+                tr.setAttribute("class", 'addlRow');
+                tr_referred.parentNode.insertBefore(tr, tr_referred.nextSibling);
+
+
+                var visitTable = $(tableId).DataTable( {
+                    dom: 'lBftip',
+                    responsive: false,
+                  colReorder: true,
+                  order: [[0, 'desc']],
+                  columnDefs: [
+                    { render: $.fn.dataTable.render.ellipsis( 12 ), targets: [4,5,6,7,8,9,10,11]}
+                    ],
+                  language: {
+                      thousands: '.',
+                      decimal: ','
+                    },
+                  buttons: [
+                    'copy',
+                    {
+                          extend: 'excelHtml5',
+                          title: 'truffle.one'
+                      },
+                      'colvis',
+                      {
+                        extend: 'searchBuilder',
+                        config: {
+                            text: "complex search"
+                        }
+                      }
+                ]
+
+                  } );
+
+                  new $.fn.dataTable.FixedHeader( visitTable );
+
+            }
+        });
+            }else{
+                get_data.remove()
+            }
+    };
+
+    function visitContact(x){
+        let companyId = x;
+        let btn_clicked = document.getElementById(companyId+"contacts");
+        idBtn = event.srcElement.id
+        let get_data=document.getElementById('row'+idBtn)
+        let get_class_name=document.querySelectorAll('.addlRow')
+        var tableId="#contacts"+companyId;
+
+        if(!get_data){
+        $.ajax({
+            url:'/contactDetails',
+            type:'post',
+            data:{ companyId: companyId},
+            success:function(data){
+                for(let i=0;i<get_class_name.length;i++){
+                    get_class_name[i].remove()
+                }
+
+                var tr_referred = btn_clicked.parentNode.parentNode;
+                var td = document.createElement('td');
+                td.innerHTML = data.htmlresponse;
+                var tr = document.createElement('tr');
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(td).setAttribute("colspan", "10");
+                tr.appendChild(td).setAttribute("class", "lastChild");
+                tr.setAttribute("Id", 'row'+idBtn);
+                tr.setAttribute("class", 'addlRow');
+                tr_referred.parentNode.insertBefore(tr, tr_referred.nextSibling);
+
+                var contactTable = $(tableId).dataTable();
+                new $.fn.dataTable.FixedHeader( contactTable );
+
+
+            }
+        });
+    }
+    else{
+                get_data.remove()
+            }
+    };
+
+
+function contentScore(x){
+        let companyId = x;
+        let btn_clicked = document.getElementById(companyId+"contentScore");
+        idBtn = event.srcElement.id
+        let get_data=document.getElementById('row'+idBtn)
+        let get_class_name=document.querySelectorAll('.addlRow')
+        var tableId="#contacts"+companyId;
+
+        if(!get_data){
+
+        $.ajax({
+            url:'/contentScore',
+            type:'post',
+            data:{ companyId: companyId },
+            success:function(data){
+                // close opened addl. rows for contacts, contentscores etc.
+                for(let i=0;i<get_class_name.length;i++){
+                    get_class_name[i].remove()
+                }
+
+                var tr_referred = btn_clicked.parentNode.parentNode;
+                var td = document.createElement('td');
+                td.innerHTML = data.htmlresponse;
+                var tr = document.createElement('tr');
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(td).setAttribute("colspan", "10");
+                tr.appendChild(td).setAttribute("class", "lastChild");
+                tr.setAttribute("Id", 'row'+idBtn);
+                tr.setAttribute("class", 'addlRow');
+                tr_referred.parentNode.insertBefore(tr, tr_referred.nextSibling);
+
+                var contactTable = $(tableId).dataTable();
+                new $.fn.dataTable.FixedHeader( contactTable );
+
+
+            }
+        });
+    }
+    else{
+                get_data.remove()
+            }
+    };
+
+    opened = null;
+
+    function expandCs(csId){
+        opened2 = opened;
+        console.log("opened=" + opened);
+        if (opened != null){
+            collapseCs();
+        }
+        if (opened2 != csId){
+            //open
+            elements = document.querySelectorAll('td[id*="occ_' + csId + '"], th[id*="occ_' + csId + '"]');
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].classList.remove("hide");
+            }
+
+            opened = csId;
+        }
+
+    }
+
+    function collapseCs(){
+        if (opened != null){
+            elements = document.querySelectorAll('td[id*="occ_' + opened + '"], th[id*="occ_' + opened + '"]');
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].classList.add("hide");
+            }
+
+            opened = null;
+        }
+    }
+
+
+
+
+
+
+
+function loadSegments() {
+    elements = document.getElementsByClassName("t1segmentCode");
+    var ids = { companyIds: []};
+    for (i = 0; i < elements.length; i++) {
+        companyId = elements[i].id.split("_").pop();
+        ids.companyIds.push(companyId);
+    }
+
+
+    $.ajax({
+        url:'/getSegmentCodes',
+        type:'post',
+        data: JSON.stringify(ids),
+        contentType: "application/json; charset=utf-8",
+        success:function(result){
+            jsonobj = JSON.parse(result);
+
+            segmentCodes = jsonobj.companySegments;
+            for (i = 0; i < segmentCodes.length; i++) {
+                companyId = segmentCodes[i].companyId;
+                const cv  = document.getElementById('segmentCode_' + companyId);
+                const ctx = cv.getContext('2d');
+                ctx.clearRect(0, 0, cv.width, cv.height);
+                colors = segmentCodes[i].colorCodes;
+                for (z = 0; z < colors.length; z++) {
+                    color = colors[z];
+                    ctx.fillStyle = "#"+ color;
+                    ctx.fillRect(z*5, 0, 5, 25);
+                }
+            }
+        }
+    });
+}
+
+function loadSources() {
+    elements = document.getElementsByClassName("t1sourceCode");
+    var ids = { companyIds: []};
+    for (i = 0; i < elements.length; i++) {
+        companyId = elements[i].id.split("_").pop();
+        ids.companyIds.push(companyId);
+    }
+
+    $.ajax({
+        url:'/getSourceCodes',
+        type:'post',
+        data: JSON.stringify(ids),
+        contentType: "application/json; charset=utf-8",
+        success:function(result){
+            jsonobj = JSON.parse(result);
+            segmentCodes = jsonobj.companySegments;
+            for (i = 0; i < segmentCodes.length; i++) {
+                companyId = segmentCodes[i].companyId;
+                const cv  = document.getElementById('sourceCode_' + companyId);
+                const ctx = cv.getContext('2d');
+                ctx.clearRect(0, 0, cv.width, cv.height);
+                colors = segmentCodes[i].colorCodes;
+                for (z = 0; z < colors.length; z++) {
+                    color = colors[z];
+                    ctx.fillStyle = "#"+ color;
+                    ctx.fillRect(z*5, 0, 5, 25);
+                }
+            }
+        }
+    });
+}
+
+
+</script>
+{% endblock %}
+
+

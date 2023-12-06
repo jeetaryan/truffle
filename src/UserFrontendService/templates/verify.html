@@ -1,0 +1,92 @@
+{% extends 'base.html'%}
+{% block title %} Verify {% endblock %}
+{% block body %}
+
+<div class="d-flex align-items-center justify-content-md-center vh-100">
+    <div class="container t1-dialogbox">
+        <div class="row mb-5">
+            <img src="/static/images/logo.svg" alt="truffle.one Account Based Marketing" class="t1-logo">
+        </div>
+        <div class="row mb-5">
+            <h1>Herzlich Willkommen bei truffle.one</h1>
+        </div>
+
+        {% if verify_msg!= '' %}
+        <div class="col-md-offset-1 col-lg-offset-1 col-xl-offset-1 col-md-10 col-lg-10 col-xl-10">
+            <p id="msg" class="error">{{verify_msg}}</p>
+            <div class="loginSubmit">
+                <a href="{{url_for('login')}}" class="regLogBtn">Zurück zum Login</a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data != '' %}
+               <!--Set password-->
+        <form>
+            <div class="form-group">
+                <input type="hidden" class="form-control" name="username" id="username" value="{{data['email']}}">
+            </div>
+            <div class="col-md-offset-1 col-lg-offset-1 col-xl-offset-1 col-md-10 col-lg-10 col-xl-10"
+                 id="update_password_block">
+                <div class="row mb-3">
+                    <div class="col-md-6 col-lg-6 col-xl-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="f_name" id="f_name"
+                                   placeholder="Vorname">
+                            <span id="f_name_msg" class="validation_msg"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6 col-lg-6 col-xl-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="l_name" id="l_name"
+                                   placeholder="Nachname">
+                            <span id="l_name_msg" class="validation_msg"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 col-lg-4 col-xl-4">
+                        <div class="form-group">
+                            <select id="gender" class="form-control">
+                                <option selected="" value="">--Geschlecht--</option>
+                                <option value="0">männlich</option>
+                                <option value="1">weiblich</option>
+                                <option value="2">divers</option>
+                            </select>
+                            <span id="gender_validate" class="validation_msg"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-lg-8 col-xl-8">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="company" id="company"
+                                   placeholder="Unternehmen">
+                            <span id="company_name_msg" class="validation_msg"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 form-group">
+                    <label for="password" class="form-label">Passwort</label>
+                    <input type="password" class="form-control t1-validate t1-validateMatch"  name="password" id="password" placeholder="Passwort" validation-msg="passwordHelp">
+                    <div id="passwordHelp" class="validation_msg text-warning">Das Passwort muss mindestens 8 Zeichen enthalten, davon mind. ein Buchstabe, eine Zahl und ein Sonderzeichen.</div>
+                </div>
+                <div class="mb-3 form-group">
+                    <label for="passwordMatch" class="form-label">Nochmal das Passwort</label>
+                    <input type="password" class="form-control t1-validateMatch"  name="passwordMatch" id="passwordMatch" placeholder="Passwort" validation-msg="passwordMatchHelp">
+                    <div id="passwordMatchHelp" class="validation_msg text-warning">Das Passwort muss übereinstimmen.</div>
+                </div>
+
+                <div class="loginSubmit">
+                    <button type="submit" name="save_password" id="save_password" class="btn btn-primary">
+                        Jetzt mit ABM loslegen!
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,333 @@
+{% extends 'navigation.html'%}
+{% block title%} Content score definition {% endblock %}
+{% block body %}
+
+
+{% set dict_subscriptionType = ["Identify", "Qualify"] %}
+{% set dict_scopeType = ["Ganze Seite", "Homepage", "Impressum", "Kontakt-Seite", "Datenschutz-Seite", "Geschäftsbedingungen"] %}
+{% set dict_regexType = ["Suchwort", "Regulärer Ausdruck"] %}
+{% set dict_codeType = ["nur im Text", "im gesamten HTML Code"] %}
+
+
+
+
+<table class="t1table tableFitsContent table nowrap">
+    <thead>
+    <tr class="headerRow">
+        <th class="fitNowrap"></th>
+        <th class="minFormNowrap">Name</th>
+        <th></th> {#later: subscriptionType #}
+        <th class="minFormNowrap">Scope</th>
+        <th class="fitNowrap"></th>
+        <th class="minFormNowrap">Suchwort</th>
+        <th class="minFormNowrap">Suchtyp</th>
+        <th class="minFormNowrap">Suchtiefe</th>
+    </tr>
+    </thead>
+
+
+    <tbody id="csTable">
+    {% set ns = namespace(csDbId=-1) %}
+    {% for cs in css %}
+    {% for st in cs.searchTerms %}
+    {% if cs.dbId != ns.csDbId %}
+        <tr id="cs{{cs.dbId}}_st{{st.dbId}}main" >
+            <td class="fitNowrap noBorder">
+                <a onclick="deleteCs({{cs.dbId}});"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                <a onclick="editCs({{cs.dbId}});"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+            </td>
+            <td  id="cs{{cs.dbId}}_name" class="noBorder">{{cs.name}}</td>
+            <td  id="cs{{cs.dbId}}_applyToAccounts" class="noBorder"></td>
+            <td  id="cs{{cs.dbId}}_scopeType" class="noBorder">{{dict_scopeType[cs.scopeType]}}</td>
+        {% else %}
+        <tr id="cs{{cs.dbId}}_st{{st.dbId}}" >
+            <td colspan="4" class="noBorder"></td>
+        {% endif %}
+            <td id="cs{{cs.dbId}}_st{{st.dbId}}_control" class="fitNowrap"></td>
+            <td id="cs{{cs.dbId}}_st{{st.dbId}}_searchTerm">{{st.searchTerm}}</td>
+            <td id="cs{{cs.dbId}}_st{{st.dbId}}_isRegex">{{dict_regexType[st.isRegex]}}</td>
+            <td id="cs{{cs.dbId}}_st{{st.dbId}}_readCode">{{dict_codeType[st.readCode]}}</td>
+    </tr>
+
+    {% if cs.dbId != ns.csDbId %}
+        <tr id="cs{{cs.dbId}}_st{{st.dbId}}_mainedit" class="hide" >
+        {% set ns.csDbId = cs.dbId %}
+            <td class="fitNowrap noBorder">
+                <a onclick="deleteCs({{cs.dbId}});"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                <a onclick="saveCs({{cs.dbId}});"><i class="fa fa-cloud-upload truffleHighlight" aria-hidden="true"></i></a>
+                <a onclick="cancelEditCs({{cs.dbId}});"><i class="fa fa-close truffleHighlight" aria-hidden="true"></i></a>
+            </td>
+            <td  id="cs{{cs.dbId}}_name_edit" class="noBorder"><input type="text" class="form-control" name="" id="cs{{cs.dbId}}_name_input_edit" value ="{{cs.name}}"></td>
+            <td  id="cs{{cs.dbId}}_applyToAccounts_edit" class="noBorder"></td>
+            <td  id="cs{{cs.dbId}}_scopeType_edit" class="noBorder">
+                <select id="cs{{cs.dbId}}_scopeType_select_edit" class="form-control">
+                {% for op in dict_scopeType %}
+                    {% if cs.scopeType == loop.index-1 %}
+                    <option value="{{loop.index}}" selected="selected">{{op}}</option>
+                    {% else %}
+                    <option value="{{loop.index}}">{{op}}</option>
+                    {% endif %}
+                {% endfor %}
+                </select>
+            </td>
+        {% else %}
+        <tr id="cs{{cs.dbId}}_st{{st.dbId}}_edit" class="hide" >
+            <td colspan="4" class="noBorder"></td>
+        {% endif %}
+            <td id="cs{{cs.dbId}}_st{{st.dbId}}_control_edit" class="fitNowrap">
+                <a onclick="deleteSt({{st.dbId}}, {{cs.dbId}});"><i class="fa fa-trash" aria-hidden="true"></i></a>
+            </td>
+            <td id="cs{{cs.dbId}}_st{{st.dbId}}_searchTerm_edit"><input type="text" id="cs{{cs.dbId}}_st{{st.dbId}}_searchTerm_input_edit" class="form-control" name="" value ="{{st.searchTerm}}"></td>
+            <td id="cs{{cs.dbId}}_st{{st.dbId}}_isRegex_edit">
+                <select id="cs{{cs.dbId}}_st{{st.dbId}}_isRegex_select_edit" class="form-control">
+                {% for op in dict_regexType %}
+                    {% if st.isRegex == loop.index-1 %}
+                    <option value="{{loop.index}}" selected="selected">{{op}}</option>
+                    {% else %}
+                    <option value="{{loop.index}}">{{op}}</option>
+                    {% endif %}
+                {% endfor %}
+                </select>
+            </td>
+            <td id="cs{{cs.dbId}}_st{{st.dbId}}_readCode_edit">
+                <select id="cs{{cs.dbId}}_st{{st.dbId}}_readCode_select_edit" class="form-control">
+                {% for op in dict_codeType %}
+                    {% if st.readCode == loop.index-1 %}
+                    <option value="{{loop.index}}" selected="selected">{{op}}</option>
+                    {% else %}
+                    <option value="{{loop.index}}">{{op}}</option>
+                    {% endif %}
+                {% endfor %}
+                </select>
+            </td>
+    </tr>
+
+
+
+
+    {% endfor %}
+    <tr id="cs{{cs.dbId}}_addSt">
+        <td colspan="8"></td>
+    </tr>
+
+    <tr id="cs{{cs.dbId}}_addSt_edit" class="hide ">
+        <td colspan="4"></td>
+        <td colspan="4">
+            <a onclick="addSearchTerm('{{cs.dbId}}');"><i class="fa fa-plus" aria-hidden="true"></i> Search Term hinzufügen</a>
+        </td>
+    </tr>
+
+
+    {% endfor %}
+    <tr id="addCs">
+        <td colspan="8"><a onclick="addContentScore();"><i class="fa fa-plus" aria-hidden="true"></i> Content Score hinzufügen</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<script language = "javascript" type = "text/javascript">
+    addCount = 0
+
+    searchTermsToBeDeleted = []
+    function deleteSt(stId, csId){
+        // remove element from DOM
+        elements = document.querySelectorAll('tr[id*="cs' + csId + '_st' + stId +'"]:not([id*="main"])');
+        if (elements.length > 0){
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].classList.add("hide");
+            }
+        } else {
+            elements = document.querySelectorAll('td[id*="cs' + csId + '_st' + stId +'"]');
+            for (let i = 0; i < elements.length; i++) {
+                ce = elements[i].children;
+                for (let i2 = 0; i2 < ce.length; i2++) {
+                    ce[i2].classList.add("hide");
+                }
+            }
+        }
+        // store ID in list to be processed by saveCs()
+        if (!stId.toString().startsWith("addedSt")){
+            searchTermsToBeDeleted.push(stId);
+        }
+    }
+
+    function deleteCs(csId){
+        alert("deleting contentScore" + csId)
+
+        // TODO: delete cs in DB
+
+    }
+
+    function saveCs(csId){
+        //alert("saving contentScore" + csId)
+
+
+
+        // remove deleted searchTerms if applicable
+        for (let i = 0; i<searchTermsToBeDeleted.length;i++){
+            //TODO delete searchTerm in DB
+        }
+        searchTermsToBeDeleted = []
+
+        // TODO: store in DB
+
+        // TODO: replace values in non-edit
+
+        cancelEditCs(csId);
+    }
+
+
+
+
+
+    function editCs(csId){
+        elements = document.querySelectorAll('tr[id*="' + csId + '"]:not([id$="edit"])');
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].classList.add("hide");
+        }
+
+        elements = document.querySelectorAll('tr[id*="' + csId + '"][id$="edit"], td[id*="' + csId + '"][id$="edit"]');
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].classList.remove("hide");
+        }
+    }
+
+    function cancelEditCs(csId) {
+        // remove added search terms
+        elements = document.querySelectorAll('tr[id*="' + csId + '"][id*="staddedSt"]');
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].parentNode.removeChild(elements[i]);
+        }
+
+        // Hide editable tr elements
+        elements = document.querySelectorAll('tr[id*="' + csId + '"][id$="edit"], td[id*="' + csId + '"][id$="edit"]');
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].classList.add("hide");
+        }
+        // in hidden tr show all td (because first search term might have been deleted)
+        elements = document.querySelectorAll('td[id*="' + csId + '"][id$="edit"]');
+        for (let i = 0; i < elements.length; i++) {
+            ce = elements[i].children;
+            for (let i2 = 0; i2 < ce.length; i2++) {
+                ce[i2].classList.remove("hide");
+                //TODO: get old values from non-editable elements
+                // input cs177_name_input_edit
+                // cs177_scopeType_select_edit
+                // cs177_st552_searchTerm_input_edit
+                // cs177_st552_isRegex_select_edit
+                // cs177_st552_readCode_select_edit
+            }
+        }
+
+        // show non-editable tr elements
+        elements = document.querySelectorAll('tr[id*="' + csId + '"]:not([id$="edit"])');
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].classList.remove("hide");
+        }
+        searchTermsToBeDeleted = []
+    }
+
+    function addSearchTerm(csId){
+        addCount += 1
+        newStRow = `<tr id="cs` + csId + `_staddedSt` + addCount + `"  class="hide">
+            <td colspan="4" class="noBorder"></td>
+            <td id="cs` + csId + `_staddedSt` + addCount + `_control" class="fitNowrap"></td>
+            <td id="cs` + csId + `_staddedSt` + addCount + `_searchTerm"></td>
+            <td id="cs` + csId + `_staddedSt` + addCount + `_isRegex"></td>
+            <td id="cs` + csId + `_staddedSt` + addCount + `_readCode"></td>
+        </tr>
+
+        <tr id="cs` + csId + `_staddedSt` + addCount + `_edit" >
+            <td colspan="4" class="noBorder"></td>
+            <td id="cs` + csId + `_staddedSt` + addCount + `_control_edit" class="fitNowrap">
+                <a onclick="deleteSt('addedSt` + addCount + `', '`+csId+`');"><i class="fa fa-trash" aria-hidden="true"></i></a>
+            </td>
+            <td id="cs` + csId + `_staddedSt` + addCount + `_searchTerm_edit"><input id="cs` + csId + `_staddedSt` + addCount + `_searchTerm_input_edit" type="text" class="form-control" name="" value =""></td>
+            <td id="cs` + csId + `_staddedSt` + addCount + `_isRegex_edit">
+                <select id="cs` + csId + `_staddedSt` + addCount + `_isRegex_select_edit" class="form-control">
+                {% for op in dict_regexType %}
+                    <option value="{{loop.index}}">{{op}}</option>
+                {% endfor %}
+                </select>
+            </td>
+            <td id="cs` + csId + `_staddedSt` + addCount + `_readCode_edit">
+                <select  id="cs` + csId + `_staddedSt` + addCount + `_readCode_select_edit" class="form-control">
+                {% for op in dict_codeType %}
+                    <option value="{{loop.index}}">{{op}}</option>
+                {% endfor %}
+                </select>
+            </td>
+        </tr>`;
+        anchorElement = document.getElementById("cs" + csId + "_addSt");
+		anchorElement.insertAdjacentHTML("beforebegin", newStRow);
+    }
+
+    function addContentScore(){
+        addCount += 1;
+        id = 'addedCs' + addCount;
+        addCount += 1;
+        stId = 'addedSt' + addCount;
+
+        newCsRow = `<tr id="cs` + id + `_st` + stId + `_main" class="hide">
+            <td class="fitNowrap noBorder">
+                <a onclick="deleteCs('` + id + `');"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                <a onclick="editCs('` + id + `');"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+            </td>
+            <td  id="cs` + id + `_name" class="noBorder"></td>
+            <td  id="cs` + id + `_applyToAccounts" class="noBorder"></td>
+            <td  id="cs` + id + `_scopeType" class="noBorder"></td>
+            <td id="cs` + id + `_st` + stId + `_control" class="fitNowrap"></td>
+            <td id="cs` + id + `_st` + stId + `_searchTerm"></td>
+            <td id="cs` + id + `_st` + stId + `_isRegex"></td>
+            <td id="cs` + id + `_st` + stId + `_readCode"></td>
+        </tr>
+        <tr id="cs` + id + `_st` + stId + `_mainedit">
+            <td class="fitNowrap noBorder">
+                <a onclick="deleteCs('`+ id + `');"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                <a onclick="saveCs('` + id + `');"><i class="fa fa-cloud-upload truffleHighlight" aria-hidden="true"></i></a>
+                <a onclick="cancelEditCs('` + id + `');"><i class="fa fa-close truffleHighlight" aria-hidden="true"></i></a>
+            </td>
+            <td  id="cs` + id + `_name_edit" class="noBorder"><input  id="cs` + id + `_name_input_edit" type="text" class="form-control" name="" value =""></td></td>
+            <td  id="cs` + id + `_applyToAccounts_edit" class="noBorder"></td>
+            <td  id="cs` + id + `_scopeType_edit" class="noBorder">
+                <select id="cs` + id + `_scopeType_select_edit" class="form-control">
+                {% for op in dict_scopeType %}
+                    <option value="{{loop.index}}">{{op}}</option>
+                {% endfor %}
+                </select>
+            </td>
+            <td id="cs` + id + `_st` + stId + `_control_edit" class="fitNowrap">
+                <a onclick="deleteSt('` + stId + `', '` + id + `');"><i class="fa fa-trash" aria-hidden="true"></i></a>
+            </td>
+            <td id="cs` + id + `_st` + stId + `_searchTerm_edit"><input id="cs` + id + `_st` + stId + `_searchTerm_input_edit" type="text" class="form-control" name="" value =""></td>
+            <td id="cs` + id + `_st` + stId + `_isRegex_edit">
+                <select id="cs` + id + `_st` + stId + `_isRegex_select_edit" class="form-control">
+                    {% for op in dict_regexType %}
+                        <option value="{{loop.index}}">{{op}}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td id="cs` + id + `_st` + stId + `_readCode_edit">
+                <select id="cs` + id + `_st` + stId + `_readCode_select_edit" class="form-control">
+                    {% for op in dict_codeType %}
+                        <option value="{{loop.index}}">{{op}}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr id="cs` + id + `_addSt" class="hide">
+            <td colspan="8"></td>
+        </tr>
+
+        <tr id="cs` + id + `_addSt_edit">
+            <td colspan="4"></td>
+            <td colspan="4">
+                <a onclick="addSearchTerm('` + id + `');"><i class="fa fa-plus" aria-hidden="true"></i> Search Term hinzufügen</a>
+            </td>
+        </tr>`;
+        anchorElement = document.getElementById("addCs");
+		anchorElement.insertAdjacentHTML("beforebegin", newCsRow);
+    }
+
+</script>
+{% endblock %}

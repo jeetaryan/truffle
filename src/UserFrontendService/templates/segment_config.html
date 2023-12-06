@@ -1,0 +1,502 @@
+{% extends 'navigation.html'%}
+{% block title%} Segmentation {% endblock %}
+{% block body %}
+
+<!-- segment selection -->
+<div class="row" style="padding-bottom:10px;">
+    <div class="col-md-2">
+        <select name="segment" id="segment" class="form-control" required="required">
+            {% for segment in segments %}
+            <option value=' + segment.id +' selected="selected">' + segment.name + '</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-1">
+        <i id="addSegment" class="fa fa-plus" style="float:left;line-height:35px;color:#ce0058 !important;"></i>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+<!--nav tabs ############################################-->
+<ul class="nav nav-tabs">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#segment_details" type="button" role="tab" aria-controls="segment_details" aria-selected="true">Segment-Details</button>
+    </li>
+        <li class="nav-item"  role="presentation">
+        <button class="nav-link" id="criteria-tab" data-bs-toggle="tab" data-bs-target="#select_criteria" type="button" role="tab" aria-controls="select_criteria" aria-selected="false">Kriterien</button>
+    </li>
+    <li class="nav-item"  role="presentation">
+        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#target_company" type="button" role="tab" aria-controls="target_company" aria-selected="false">Target Accounts</button>
+    </li>
+    <li class="nav-item"  role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#Convert_Taktiken" type="button" role="tab" aria-controls="Convert_Taktiken" aria-selected="false">Convert-Taktiken</button>
+    </li>
+</ul>
+
+
+<!--nav tabs body ########################################-->
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane show active" id="segment_details" role="tabpanel" aria-labelledby="segment_details">
+        <div id="tabSegmentDetails" class="t1Tab-content" style="display: block;">
+            <table class="t1table tableFitsContent table nowrap">
+                <tr>
+                    <td class="minFormNowrap">ID</td>
+                    <td class="minFormNowrap" id="segmentId">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="minFormNowrap">Name</td>
+                    <td class="minFormNowrap"><input type="text" id="segmentName" class="form-control">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="minFormNowrap">Beschreibung</td>
+                    <td class="minFormNowrap"><textarea id="segmentDescription" class="form-control" rows="5">
+                    </textarea></td>
+                </tr>
+                <tr>
+                    <td class="minFormNowrap">Farbe</td>
+                    <td class="minFormNowrap"><input type="color" id="segmentColor">
+                    </td>
+                </tr>
+                <tr>
+                    <div class="form-check">
+                    <td class="minFormNowrap"><label for="segmentWriteProtected">Segment vor Änderungen schützen</label></td>
+                    <td class="minFormNowrap">
+                            <input type="checkbox" id="segmentWriteProtected" name="segmentWriteProtected" class="form-check-input">
+
+                    </td>
+                        </div>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td class="minFormNowrap">
+                        <button type="submit" id="saveSegment" class="btn btn-primary">Speichern
+                        </button>
+                        <button type="submit" id="delSegment"  class="btn btn-secondary">Löschen
+                        </button>
+
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <!----------- CRITERIA TAB ----------->
+    <div class="tab-pane" id="select_criteria">
+        <div id="filterBuilder"></div>
+        <div class="form-check">
+        <input type="checkbox" id="autoUpdate" name="autoUpdate" class="form-check-input"><label for="autoUpdate">AutoUpdate</label>
+        </div>
+        <br>
+        <button class="btn btn-primary" id="replaceTargetsByFilter">Targets ersetzen</button>
+        <button class="btn btn-secondary" id="addTargetsByFilter">Targets hinzufügen</button>
+
+        <script src="{{url_for('static', filename='js/query-builder.standalone.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/query-builder.de.js')}}"></script>
+        <script src="/filter.js"></script>
+    </div>
+
+
+
+    <div class="tab-pane" id="Convert_Taktiken">
+        <table class="t1table table noborder nowrap">
+            <!-- start of Linkedin -->
+            <tr>
+                {% if linkedInOauth_link is not none and linkedInOauth_link != "None" %}
+                <td width="10%"><a href="{{linkedInOauth_link}}"><img src="/static/images/linkedin-white-broken.svg"
+                                                                      height="60px" class="t1tacticsIcon"></a></td>
+                <td><a href="{{linkedInOauth_link}}">Ihren truffle.one Account mit LinkedIn verbinden</a></td>
+                {% else %}
+                <td width="10%"><img src="/static/images/linkedin-white.svg" height="60px" class="t1tacticsIcon"></td>
+                <td>
+
+                    <table class="t1table tableFitsContent table nowrap">
+                        <thead>
+                        <tr id="linkedinCampaignSelectHeader">
+                            <td>Ad-Account</td>
+                            <td>Kampagnen-Gruppe</td>
+                            <td>Kampagne</td>
+                            <td></td>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr>
+                            <td>
+                                <div class="form-group"><select class="form-control" id="adAccounts">
+                                    <option>Ad-Accounts werden geladen</option>
+                                </select></div>
+                            </td>
+
+                            <td>
+                                <div class="form-group"><select class="form-control" id="campaignGroups">
+                                    <option>zuerst Ad-Account wählen</option>
+                                </select></div>
+                            </td>
+
+                            <td>
+                                <div class="form-group"><select class="form-control" id="campaigns">
+                                    <option>zuerst Kampagnen-Gruppe wählen</option>
+                                </select></div>
+                            </td>
+                            <td>
+                                <a id="addTargetingButton"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+
+                {% endif %}
+            </tr>
+            <!-- end of section Linkedin -->
+
+            <tr>
+                <td><img src="/static/images/google-ads-white-broken.svg" class="t1tacticsIcon"></td>
+                <td>nicht verbunden</td>
+            </tr>
+            <tr>
+                <td><img src="/static/images/t3n-white-broken.svg" class="t1tacticsIcon"></td>
+                <td>nicht verbunden</td>
+            </tr>
+            <tr>
+                <td><img src="/static/images/xing-white-broken.svg" class="t1tacticsIcon"></td>
+                <td>nicht verbunden</td>
+            </tr>
+            <tr>
+                <td><img src="/static/images/salesforce-white-broken.svg" class="t1tacticsIcon"></td>
+                <td>nicht verbunden</td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+
+
+    <div class="tab-pane" id="target_company">
+        <br>
+        <table id="targetCompaniesTable" class="t1table tableFitsContent table nowrap">
+            <thead>
+            <tr>
+                <th>Unternehmen</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="targetCompaniesBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+    loadSegmentsDropdown(null);
+});
+
+$('#segment').change( function() {
+     loadSegment(this.value);
+});
+
+$('#delSegment').click( function() {
+    delSegment($('#segmentId').text())
+});
+
+$('#saveSegment').click( function() {
+    saveSegment($('#segmentId').text())
+});
+
+$('#addSegment').click( function() {
+    $('#segment').append('<option value="add_new">Un-named segment</option>');
+    loadSegment(null);
+});
+
+function loadSegment(segmentId){
+     loadSegmentDetails(segmentId);
+     loadSegmentFilter(segmentId);
+     loadSegmentConvertTactics(segmentId);
+     loadTargetCompanies(segmentId);
+
+ }
+
+
+
+function saveSegment(id){
+      let name = $('#segmentName').val();
+      let desc =  $('#segmentDescription').val();
+      let colorCode = $('#segmentColor').val();
+      if (name == 'Un-named segment'){
+        alert("please provide a proper name.");
+      }
+      else{
+          if (id == ''){
+            url = '/segment/addSegment';
+            id = null
+          }
+          else{
+            url = '/segment/'+id+'/update';
+          }
+        $.ajax({
+            url: url,
+            type:'post',
+            data: JSON.stringify({id:id, name:name, description:desc, colorCode:colorCode}),
+            contentType: "application/json; charset=utf-8",
+            success:function(response){
+                console.log(response);
+                loadSegmentsDropdown(response);
+            }
+          });
+        }
+}
+
+function delSegment(segmentId){
+    $.ajax({
+        url:'segment/'+segmentId+'/delete',
+        type:'post',
+        data: JSON.stringify({}),
+        contentType: "application/json; charset=utf-8",
+        success:function(response){
+            loadSegmentsDropdown(null);
+        }
+      });
+}
+
+
+function loadSegmentsDropdown(segmentId){
+    $.ajax({
+        url:'/getSegments',
+        type:'get',
+        data:{},
+        success:function(response){
+            $('#segment').empty();
+            jsonobj = JSON.parse(response);
+            $('#segment').append(jsonobj.map(function(sObj){
+                return '<option value=' + sObj.id +'>' + sObj.name + '</option>';
+            }));
+
+            if (segmentId === null) {
+                $('#segment>option:eq(0)').prop('selected', true);
+                segmentId = $('#segment').val();
+            } else {
+                $('#segment').val(segmentId);
+            }
+            loadSegment(segmentId);
+        }
+    });
+ }
+
+function loadSegmentDetails(segmentId){
+    if (segmentId != null){
+        $.ajax({
+            url:'/segment/'+segmentId+'/getDetails',
+            data:{'segmentId':segmentId},
+            type:'get',
+            success:function(result){
+                jsonobj = JSON.parse(result);
+                $('#segmentId').text(jsonobj.id);
+                $('#segmentName').val(jsonobj.name);
+                $('#segmentDescription').val(jsonobj.description);
+                $('#segmentColor').val("#"+jsonobj.colorCode);
+                $("#delSegment").show();
+            }
+        });
+    } else {
+        $('#segment').val('add_new');
+        $('#segmentId').text('');
+        $('#segmentName').val('Un-named segment');
+        $('#segmentDescription').val('');
+        $('#segmentColor').val('#ffffff');
+        $("#delSegment").hide();
+
+    }
+}
+
+
+function loadTargetCompanies(segmentId){
+    $('#targetCompaniesBody').empty();
+    if (segmentId != null) {
+        $.ajax({
+            url:'/segment/'+segmentId+'/getCompanies',
+            type:'get',
+            success:function(result){
+                jsonobj = JSON.parse(result);
+
+                $('#targetCompaniesBody').append(jsonobj.map(function(sObj){
+                    targetCompanyRow = '<tr id="targetCompany_'+sObj.companyId+'">';
+                    targetCompanyRow += "<td>"+sObj.companyName+"</td>";
+                    targetCompanyRow += '<td><a href="#" onclick="removeCompaniesFromSegment('+segmentId+', ['+sObj.companyId+'])"><i class="fa fa-times"></i></a></td>';
+                    targetCompanyRow += "</tr>";
+                    return targetCompanyRow;
+                }));
+            }
+        });
+    }
+}
+
+function loadSegmentConvertTactics(segmentId){
+    loadTacticLinkedin(segmentId);
+}
+
+
+// get LinkedIn tactic
+function loadTacticLinkedin(segmentId){
+    {% if linkedInOauth_link is none or linkedInOauth_link == "None" %}
+    $('#adAccounts').prop('disabled', 'disabled');
+    $('#campaignGroups').prop('disabled', 'disabled');
+    $('#campaigns').prop('disabled', 'disabled');
+    $('#addTargetingButton').prop('disabled', 'disabled');
+
+    loadLinkedinTargeting(segmentId);
+
+    $.ajax({
+        url:'/getLinkedinAdAccounts',
+        type:'post',
+        data:{},
+        success:function(result){
+            jsonobj = JSON.parse(result);
+            $('#adAccounts').empty();
+            $('#adAccounts').append('<option value="None" id="defaultAdAccount">AdAccount wählen</option>');
+            $('#adAccounts').append(jsonobj.map(function(sObj){
+                return '<option value="'+sObj.id+'">'+ sObj.name +'</option>'
+            }));
+            $('#adAccounts').prop('disabled', false);
+        }
+    });
+
+    $('#adAccounts').change( function() {
+        loadCampaignGroups(this.value)
+    });
+
+    $('#campaignGroups').change( function() {
+        loadCampaigns(this.value);
+    });
+
+    {% endif %}
+ }
+
+
+function loadLinkedinTargeting(segmentId){
+    $("[id^='LinkedinTargetCampaign']").remove();
+    if (segmentId != null){
+        $.ajax({
+            url:'/segment/'+segmentId+'/getLinkedinTargetings',
+            type:'get',
+            data:{},
+            success:function(result){
+                jsonobj = JSON.parse(result);
+                $('#linkedinCampaignSelectHeader').after(jsonobj.map(function(sObj){
+                    return '<tr id="LinkedinTargetCampaign'+sObj.id+'"><td>'+ sObj.campaignGroup.adAccount.name +'</td><td>'+ sObj.campaignGroup.name +'</td><td>'+ sObj.name +'</td><td><a onclick="removeTargeting('+sObj.id+');"><i class="fa fa-trash" aria-hidden="true"></i></a></td></tr>'
+                }));
+            }
+        });
+    }
+}
+
+
+
+
+function loadCampaignGroups(adAccount){
+    $('#defaultAdAccount').remove();
+    $('#campaignGroups').empty();
+    $('#campaignGroups').append('<option>Kampagnengruppen werden geladen...</option>');
+
+    $.ajax({
+        url:'/getLinkedinCampaignGroups',
+        type:'post',
+        data:{ adAccount: adAccount },
+        success:function(result){
+            jsonobj = JSON.parse(result)
+
+            $('#campaignGroups').empty()
+            $('#campaignGroups').append('<option value="None" id="defaultCampaignGroup">Kampagnengruppe wählen</option>');
+            $('#addTargetingButton').off('click');
+            $('#campaignGroups').append(jsonobj.map(function(sObj){
+                return '<option value="'+sObj.id+'">'+ sObj.name +'</option>'
+            }));
+            $('#campaignGroups').prop('disabled', false);
+        }
+    });
+}
+
+
+
+function loadCampaigns(campaignGroup){
+    $('#defaultCampaignGroup').remove();
+    $('#campaigns').empty();
+    $('#campaigns').append('<option>Kampagnen werden geladen...</option>');
+    $.ajax({
+        url:'/getLinkedinCampaigns',
+        type:'post',
+        data:{ campaignGroup: campaignGroup },
+        success:function(result){
+            jsonobj = JSON.parse(result)
+            $('#campaigns').empty()
+            $('#campaigns').append('<option value="None" id="defaultCampaign">Kampagne wählen</option>');
+            $('#addTargetingButton').off('click');
+            $('#campaigns').append(jsonobj.map(function(sObj){
+                if($("#LinkedinTargetCampaign" + sObj.id).length == 0) {
+                    return '<option value="'+sObj.id+'" id="campaignOption'+sObj.id+'">'+ sObj.name +'</option>'
+                } else {
+                    return ''
+                }
+            }));
+            $('#campaigns').prop('disabled', false);
+        }
+    });
+}
+
+$('#campaigns').change( function() {
+    $('#defaultCampaign').remove();
+    $('#addTargetingButton').prop('disabled', false);
+    $('#addTargetingButton').click(function(){
+        addTargeting();
+    });
+});
+
+
+
+function removeTargeting(campaignId){
+    segmentId = $('#segment').val();
+    $.ajax({
+        url:'/segment/'+segmentId+'/removeLinkedinTargeting',
+        type:'post',
+        data:{campaignId: campaignId},
+        success:function(result){
+            $('#LinkedinTargetCampaign'+campaignId).remove();
+        }
+    });
+}
+
+function addTargeting(){
+    campaignId = $('#campaigns').val();
+    campaignName = $('#campaigns').children(':selected').text();
+    campaignGroupName = $('#campaignGroups').children(':selected').text();
+    adAccountName = $('#adAccounts').children(':selected').text();
+    segmentId = $('#segment').val();
+    $.ajax({
+        url:'/segment/'+segmentId+'/addLinkedinTargeting',
+        type:'post',
+        data:{campaignId: campaignId},
+        success:function(result){
+            campaignToAdd = '<tr id="LinkedinTargetCampaign'+campaignId+'"><td>'+ adAccountName +'</td><td>'+ campaignGroupName +'</td><td>'+ campaignName +'</td><td><a onclick="removeTargeting(campaignId, segmentId);"><i class="fa fa-trash" aria-hidden="true"></i></a></td></tr>';
+            $('#linkedinCampaignSelectHeader').after(campaignToAdd);
+            $('#campaignOption' + campaignId).remove();
+        }
+    });
+}
+
+
+
+
+
+
+</script>
+{% endblock %}

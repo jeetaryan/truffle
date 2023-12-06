@@ -1,0 +1,195 @@
+{% if name == "visit_details" %}
+<table id="visits{{companyId}}" class="t1table table nowrap">
+    <thead>
+    <tr>
+        <th>Letzter Besuch</th>
+        <th>Besuchte Seite</th>
+        <th>Dauer</th>
+        <th>Scrolltiefe</th>
+        <th>Source</th>
+        <th>Medium</th>
+        <th>Campaign</th>
+        <th>Term</th>
+        <th>Content</th>
+        <th>Gclid</th>
+        <th>Referrer</th>
+        <th>Parameters</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for item in data %}
+    <tr>
+        <td id="detailsLastvisit">
+            {{item[0]}}
+        </td>
+        <td><a href=https://{{item[1]}} target=new>{{item[1]}}</a></td>
+        <td>{%if item[2] is none %}unknown
+            {% else %}{{item[2]|hrsminsec}}
+            {% endif %}
+        </td>
+        <td>{{item[3]}} %</td>
+        <td>{{item[4]}}</td>
+        <td>{{item[5]}}</td>
+        <td>{{item[6]}}</td>
+        <td>{{item[7]}}</td>
+        <td>{{item[8]}}</td>
+        <td>{{item[9]}}</td>
+        <td>{{item[10]}}</td>
+        <td>{{item[11]}}</td>
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+{% endif %}
+
+
+{% if name == "contact_details" %}
+<table id="contacts{{companyId}}" class="t1table table nowrap">
+    <thead>
+    <tr>
+        <th>Vorname</th>
+        <th>Nachname</th>
+        <th>Geschlecht</th>
+        <th>Position</th>
+        <th>Telefon</th>
+        <th>Email</th>
+        <th>Linkedin</th>
+        <th>Twitter</th>
+        <th>Adresse</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in data %}
+    <tr>
+        <td>{{ row[0] if row[0] is not none }}</td>
+        <td>{{ row[1] if row[1] is not none }}</td>
+        <td>{% if row[2] == 0 %}m{% elif row[2] == 1 %}w{% endif %}</td>
+        <td>{{ row[3] if row[3] is not none }}</td>
+        <td>{{ row[4] if row[4] is not none }}</td>
+        <td>
+            <a href="mailto:{{row[5]}}" target="_blank">{{row[5]}}</a>
+        </td>
+        <td>{% if row[6] is not none %}<a href="http://www.linkedin.com/in/{{row[6]}}" target="_blank">{{row[6]}}</a>{%
+            endif %}
+        </td>
+        <td>{% if row[7] is not none %}<a href="http://www.twitter.com/{{row[7]}}" target="_blank">{{row[7]}}</a>{%
+            endif %}
+        </td>
+        <td>{{ row[8] if row[8] is not none }}{{ ','~row[9] if row[9] is not none }}{{ ','~row[10] if row[10] is not
+            none }}{{ ','~row[11] if row[11] is not none }}
+        </td>
+
+    </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+{% endif %}
+
+
+{% set dict_subscriptionType = ["Identify", "Qualify"] %}
+{% set dict_scopeType = ["Ganze Seite", "Homepage", "Impressum", "Kontakt-Seite", "Datenschutz-Seite", "Geschäftsbedingungen"] %}
+{% set dict_regexType = ["Suchwort", "Regulärer Ausdruck"] %}
+{% set dict_codeType = ["nur im Text", "im gesamten HTML Code"] %}
+
+{% if name == "contactScore" %}
+
+
+<table id="contentScore{{companyId}}" class="t1table tableFitsContent table nowrap">
+    <thead>
+    <tr>
+        <th>Website</th>
+        {% if data|length > 0 %}
+        {% for score in data[0] %}
+        <th class="strongBorderLeft">{{score.name}}<br>({{dict_scopeType[score.scopeType]}})<br><a
+                onclick="expandCs({{score.dbId}});"><i class="fa fa-search"></i></a></th>
+        {% for st in score.searchTerms %}
+        <th id="occ_{{score.dbId}}_header" class="hide">{{st.searchTerm}}<br>({{dict_regexType[st.isRegex]}})</th>
+        {% endfor %}
+        {% endfor %}
+        {% endif %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for website in data %}
+    <tr>
+        <td>{{website[0].scoredWebsite.website}}</td>
+        {% for score in website %}
+        <td class="strongBorderLeft">{{score.count}}</td>
+        {% for st in score.searchTerms %}
+        <td id="occ_{{score.dbId}}_{{st.dbId}}" class="hide">{{st.count}}</td>
+        {% endfor %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{url_for('contentScoreDefinition')}}" style="color:#fff;text-decoration:none;">
+    <i class="fa fa-pencil"></i> Content scores definieren
+</a>
+
+<br>
+
+{% endif %}
+
+
+
+
+
+{% if name =="segments"%}
+<tr class="addlRow"><td></td><td></td><td></td><td colspan="10" class="lastChild">
+    {% if segments|length > 0 %}
+    <table>
+        <thead>
+        <tr>
+            <th>Segment</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for segment in segments %}
+        <tr id="segment_company_assignment_{{segment.id}}">
+            <td>{{segment.name}}</td>
+            <td>
+                <a href="#" onclick="removeCompaniesFromSegment({{segment.id}}, [{{companyId}}]);">
+                    <i class="fa fa-trash"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+            </tbody>
+    </table>
+
+    {% else %}
+    Unternehmen ist keinem Segment zugeordnet
+    {% endif %}
+</td></tr>
+{% endif %}
+
+
+{% if name=="sources" %}
+<tr class="addlRow"><td></td><td></td><td></td><td colspan="10" class="lastChild">
+    {% if sources|length > 0 %}
+    <table>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Quelle</th>
+        </tr>
+        </thead>
+        <body>
+
+        {% for source in sources %}
+        <tr>
+            <td><div style="width:20px;height:20px;background-color:#{{source.colorCode}};"></div></td>
+            <td>{{source.name}}</td>
+        </tr>
+        {% endfor %}
+        </body>
+    </table>
+    {% endif %}
+</td></tr>
+{% endif %}

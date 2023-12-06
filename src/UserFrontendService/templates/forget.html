@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% block title %}Forget password{% endblock %}
+
+{% block body %}
+<div class="container-fluid log_container register">
+    <div class="log_container_block">
+
+         <!--        start logo section-->
+        <div class="row">
+            <div class="col-md-offset-1 col-lg-offset-1 col-xl-offset-1">
+            <img src="/static/images/logo.svg" alt="truffle.one" style="max-width:180px;">
+                </div>
+        </div>
+        <!--        end logo section-->
+
+        <br>
+
+                <div class="col-md-offset-1 col-lg-offset-1 col-xl-offset-1 col-md-10 col-lg-10 col-xl-10">
+
+            <h2>Forget password</h2>
+            <p id="msg" class="error"></p>
+<!--            forget password-->
+                <div id="sendOtp">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="email" id="email" placeholder="E-mail address"
+                           onkeyup="register_email_check()">
+                    <span id="email_msg_format" class="validation_msg">Email-Adresse ist nicht korrekt</span>
+
+                </div>
+
+                <span id="p_register_style">
+                <p>Im Namen meines Unternehmens akzeptiere ich die AGB
+                     und <a href="https://www.truffle.one/about-account-based-marketing-agentur/datenschutzerklaerung-2/">Datenschutzbedingungen.</a></p>
+                </span>
+                <!--               Start button-->
+                <div class="loginSubmit">
+                    <button type="submit" name="send_otp" id="login" class="loginSubBtn" onclick="sendOtp()">Verify</button>
+                    <a href="{{url_for('login')}}" class="regLogBtn">Zurück zur Login-Seite</a>
+
+                </div>
+                <!--                end button-->
+                </div>
+<!--            end forget password-->
+
+<!--            verify otp-->
+            <div id="verify_otp">
+                <div class="form-group">
+                    <span class="validation_msg"> Bitte bestätigen Sie den Link, den wir Ihnen per Email zugesendet haben.</span>
+
+                </div>
+                <div class="loginSubmit">
+                    <a href="{{url_for('login')}}" class="regLogBtn">Back To Login</a>
+                </div>
+            </div>
+<!--            end verify otp-->
+
+<!--            Set password-->
+            {% if data != '' %}
+        <div class="col-md-12 col-lg-12 col-xl-12" id="update_password_block">
+            <p id="error_password" class="validation_msg"></p>
+             <div class="form-group">
+                <input type="hidden" class="form-control" name="verifyEmail" id="verifyEmail"
+                       value="{{data}}">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" name="password" id="password"
+                       placeholder="Enter password..." onkeyup="match_regex_password();">
+                <span id="pwd_msg" class="validation_msg"> Your password must contain minimum eight characters, at least one letter, one number and one special character.</span>
+
+            </div>
+
+            <div class="form-group">
+                <input type="password" class="form-control" name="c_password" id="c_password"
+                       placeholder="Re-enter password..." onkeyup="match_password();">
+            </div>
+
+            <div class="loginSubmit">
+                <button type="submit" name="save_password" id="save_password" class="loginSubBtn" onclick="update_password()">
+                    Update Password
+                </button>
+            </div>
+        </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+      let link = window.location.href
+      if (link.includes('verify_for_forget')){
+            $('#update_password_block').prop('hidden', false);
+            $('#sendOtp').prop('hidden', true);
+      }
+      else{
+            $('#update_password_block').prop('hidden', true);
+            $('#sendOtp').prop('hidden', false);
+
+      }
+      $('#verify_otp').prop('hidden', true);
+      $('#msg').prop('hidden', true);
+      $('#pwd_msg').prop('hidden', true);
+      $('#error_password').prop('hidden', true);
+      document.getElementById("email_msg_format").style.display = "none";
+      $(':input[type="submit"]').prop('disabled', true);
+
+    });
+
+    function register_email_check(){
+
+    let email = document.getElementById("email").value;
+    let email_case =  email.toLowerCase();
+    let email_regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if(!email_case.match(email_regex)){
+       document.getElementById("email_msg_format").style.display = "block";
+    }
+    else{
+       document.getElementById("email_msg_format").style.display = "none";
+       $(':input[type="submit"]').prop('disabled', false);
+    }
+}
+
+<!--    sendOtp-->
+function sendOtp(){
+console.log("hello this otp check")
+    email = document.getElementById('email').value;
+    $.ajax({
+        url:'/forget',
+        data:{'email':email},
+        method:'post',
+        success:function(data){
+        if(data.output.email){
+            $('#sendOtp').prop('hidden', true);
+            $('#verify_otp').prop('hidden', false);
+            $('#btn_verify').prop('disabled', true);
+        }
+        else{
+            $('#msg').prop('hidden', false);
+            $('#msg').html(data.output.msg);
+        }
+        }
+    });
+    }
+<!--end sendOtp-->
+
+
+<!--update password-->
+
+ function match_regex_password(){
+        let password = document.getElementById('password').value;
+        let regex = /^(?=.*[A-Za-zäöüÄÖÜß])(?=.*\d)(?=.*[@$!%*#?&§`~/{}\"\(\)\=\+\*\~\-\_\\\[\]\}\^\°])[A-Za-zäöüÄÖÜß\d@$!%*#?&§`~/{}\"\(\)\=\+\*\~\-\_\\\[\]\}\^\°]{8,}$/;
+
+        if (!password.match(regex)) {
+            document.getElementById("pwd_msg").style.display = "block";
+        }
+        else{
+            document.getElementById("pwd_msg").style.display = "none";
+
+        }
+
+   }
+
+function match_password(){
+    let password = document.getElementById('password').value;
+    let c_password = document.getElementById('c_password').value;
+
+        if(password == c_password){
+            $("#save_password").prop('disabled', false);
+            $('#error_password').prop('hidden', true);
+
+        }
+        else{
+            $('#error_password').prop('hidden', false);
+            $("#error_password").html("Password do not match.")
+            $("#save_password").prop('disabled', true);
+
+        }
+}
+
+function update_password(){
+    let password = document.getElementById('password').value;
+    let email = document.getElementById('verifyEmail').value;
+    $.ajax({
+            url:'/update_password',
+            type:'post',
+            data:{ password: password, email:email},
+            success:function(data){
+            console.log(data)
+                    if(data != 0)
+                    {
+                        window.location = '/';
+                    }
+                    else{
+                        $('#error_password').prop('hidden', false);
+                    }
+            }
+    });
+    };
+
+
+<!--end update password-->
+</script>
+{% endblock %}

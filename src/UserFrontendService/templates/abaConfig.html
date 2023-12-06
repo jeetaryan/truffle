@@ -1,0 +1,494 @@
+{% extends 'navigation.html'%}
+{% block title%} Aba Config {% endblock %}
+{% block body %}
+
+<style>
+
+.nav-tabs>li>a {
+margin-right:0;
+}
+
+.nav-tabs li{
+    border: 1px solid #fff;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin-right:3px;
+}
+
+.ad_row{
+padding-bottom:10px;
+}
+
+input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+}
+input[type="radio"].toggle {
+  display: none;
+}
+
+input[type="radio"].toggle:checked + label {
+  /* Do something special with the selected state */
+}
+
+.display_none{
+    display:none;
+}
+
+
+
+
+</style>
+
+<div class="row">
+    <div class="col-md-3">
+        <label>Account Based Advertising</label>
+    </div>
+</div>
+
+<div class="row" style="padding-bottom:10px;">
+    <div class="col-md-2">
+        <select name="advertiser" id="advertiser" class="form-control" required="required" onchange="bindCampaigns()">
+        </select>
+    </div>
+    <div class="col-md-1">
+        <a href="#advertiseModel" data-toggle="modal" data-target="#advertiseModel" onclick="editAdvertiser()">
+            <i class="fa fa-pencil" style="float:left;line-height:35px;font-size:18px;"></i>
+        </a>
+        <i class="fa fa-trash" onclick="deleteAdvertise()"
+           style="float:left;line-height:35px;font-size:18px;"></i>
+        <a href="#advertiseModel" data-toggle="modal" data-target="#advertiseModel">
+            <i class="fa fa-plus" style="float:left;line-height:35px;font-size:18px;"></i>
+        </a>
+    </div>
+</div>
+<div class="row" style="padding-bottom:10px;">
+    <div class="col-md-2">
+        <select name="campaign" id="campaign" class="form-control" required="required" onchange="campaignDetails();">
+        </select>
+    </div>
+    <div class="col-md-1">
+        <i class="fa fa-trash" onclick="deleteCampaign()" id="campaignDel"
+           style="float:left;line-height:35px;font-size:18px;"></i>
+        <a href="#campaignModel" data-toggle="modal" data-target="#campaignModel">
+            <i class="fa fa-plus" style="float:left;line-height:35px;font-size:18px;"></i>
+        </a>
+    </div>
+</div>
+
+<!--create tab for other ABA config details ########################-->
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a href="#campaignDetails" data-toggle="tab">Campaign Details</a>
+    </li>
+    <li><a href="#Advertising" data-toggle="tab">Advertising</a>
+    </li>
+    <li><a href="#target" data-toggle="tab">Targeting</a>
+    </li>
+    <li><a href="#performance" data-toggle="tab">Performance</a>
+    </li>
+</ul>
+<!--nav tabs body ########################################-->
+<div class="tab-content ">
+    <!--    campaign block -->
+    <div class="tab-pane active" id="campaignDetails">
+        <div id="tabCampaignDetails" class="t1Tab-content" style="display: block;">
+            <table class="t1table tableFitsContent table nowrap" style="width:500px;">
+                <tr>
+                    <td class="minFormNowrap">ID</td>
+                    <td class="minFormNowrap" id="campaignId">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="minFormNowrap">Name</td>
+                    <td class="minFormNowrap"><input type="text" id="campaignsName" class="form-control"></td>
+                </tr>
+                <tr>
+                    <td class="minFormNowrap"><input type="datetime-local" class="form-control" placeholder="from"
+                                                     id="from"></td>
+                    <td class="minFormNowrap"><input type="datetime-local" class="form-control" placeholder="till"
+                                                     id="till"></td>
+                </tr>
+
+                <tr>
+                    <td class="minFormNowrap"><input type="checkbox" id="active" name="active"> Active</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td class="minFormNowrap">
+                        <button type="submit" id="addNewSegment" class="btn-save" onclick="addCampaignDetails();"
+                                style="border:2px solid #ce0058;float:right;">Save
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <!--    advertising block -->
+    <div class="tab-pane" id="Advertising">
+        <div id="tabAdvertising" class="t1Tab-content" style="display: block;">
+            <br>
+               <!-- notification message blok -->
+    <div id="notification" style="display: none; width:400px;">
+        <div style="padding: 5px;">
+            <div id="inner-message" class="alert alert-success">
+                <i class="fas fa-asterisk" style="font-size:20px;color: red;"></i>
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        </div>
+    </div>
+    <!-- end notification message blok -->
+            <form id="upload_file" method="post" name="addver" enctype="multipart/form-data">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <input type="text" class="form-control" id="headline1" placeholder="headline...">
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" onclick="check1();"
+                                           id="customSwitches1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                            <textarea class="form-control" id="textarea1" name="textarea1"
+                                      placeholder="text area.."></textarea>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" onclick="check2();"
+                                           id="customSwitches2">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <input type="text" class="form-control" id="link1" name="link1" placeholder="link...">
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" onclick="check3();"
+                                           id="customSwitches3">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <input type="text" class="form-control" id="attribution1" name="attribution1"
+                                       placeholder="attribution">
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" onclick="check4();"
+                                           id="customSwitches4">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <input type="file" class="form-control" name="image" id="file1" placeholder="headline">
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" onclick="check5();"
+                                           id="customSwitches5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <input type="text" id="headline2" class="form-control" placeholder="headline...">
+                            </div>
+                        </div>
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <textarea class="form-control" id="textarea2" placeholder="text area.."></textarea>
+                            </div>
+                        </div>
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <input type="text" class="form-control" id="link2" placeholder="link...">
+                            </div>
+                        </div>
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <input type="text" class="form-control" id="attribution2" placeholder="attribution">
+                            </div>
+                        </div>
+                        <div class="row ad_row">
+                            <div class="col-md-11">
+                                <input type="file" class="form-control" id="file2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <table style="width:200px;">
+                <tr>
+                    <td colspan="2">
+                        <div class="form-check" style="color:white;">
+                            <input type="checkbox" class="form-check-input" id="check1" name="check1" value="1">
+                            <label class="form-check-label" for="check1"> t3n home page</label>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="#t3nModel" id="t3nC" data-toggle="modal" onclick="t3nContentPage();"> t3nContentPreview</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="form-check" style="color:white;">
+                            <input type="checkbox" class="form-check-input" id="check2" name="check2" value="1">
+                            <label class="form-check-label" for="check1"> t3n content page</label>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="#t3nModel" id="t3nH" data-toggle="modal" onclick="t3nHtmlPage();"> t3nHtmlPreview</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="minFormNowrap" style="padding-top:10px;">
+                        <button class="btn-save" onclick="savePostContentData();"
+                                style="border:2px solid #ce0058;">Save content
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <!--    target block -->
+    <div class="tab-pane" id="target">
+        <form id="form_target" action="/campaign/addTargeting" enctype="multipart/form-data" method="post">
+            <div id="tabTarget" class="t1Tab-content" style="display: block;">
+                <br>
+                <div class="row ad_row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="ip" name="ip">
+                    </div>
+                </div>
+                <div class="row ad_row">
+                    <div class="col-md-4">
+                        <input type="file" class="form-control" name="filename">
+                    </div>
+                </div>
+                <div class="row ad_row">
+                    <div class="col-md-4">
+                        <p id="rangeTargeted"></p>
+                    </div>
+                </div>
+                <div class="row ad_row">
+                    <div class="col-md-4">
+                        <button type="submit" class="btn-save"
+                                style="border:2px solid #ce0058;float:right;">Add to targeting
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--    performance block -->
+    <div class="tab-pane" id="performance">
+        <div id="tabPerformance" class="t1Tab-content" style="display: block;">
+            <table style="width:800px;" class="t1table table nowrap">
+                <tr style="text-align:center;">
+                    <td></td>
+                    <td colspan="3">Total</td>
+                    <td colspan="3">Desktop</td>
+                    <td colspan="3">Mobile</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Impressi ons</td>
+                    <td>Clicks</td>
+                    <td>Coversi rate</td>
+                    <td>Impressi ons</td>
+                    <td>Clicks</td>
+                    <td>Coversi rate</td>
+                    <td>Impressi ons</td>
+                    <td>Clicks</td>
+                    <td>Coversi rate</td>
+                </tr>
+                <tr id="t3nHomePage">
+                    <td>t3n <br> homepage</td>
+                </tr>
+                <tr id="t3nContentPage">
+                    <td>t3n content<br> page</td>
+                </tr>
+                <tr id="t3nTotal">
+                    <td>total</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!--desktop design -->
+<div id="a1">
+    <article class="c-pin tg-articletype-sponsored-post" id="t1nativeAd">
+
+        <div class="o-grid">
+            <div class="c-pin__image">
+                <a href="" id="link_url1"
+                   onclick="
+                var aba_click = {};
+                aba_click['adId']=7;
+                var abarequest = new XMLHttpRequest();
+                abarequest.open('POST', 'https://api.truffle.one/abaclick', true);
+                abarequest.setRequestHeader('Content-Type', 'application/json');
+                abarequest.send(JSON.stringify(aba_click));">
+                    <img data-src="" id="truffleone_img1" src="" width="200" height="167" alt=""
+                         title="" class="loaded" data-was-processed="true">
+                    <noscript id="myElement">
+                        <img src="" width="200" height="167" alt="" title=""/>
+                    </noscript>
+                </a>
+            </div>
+            <div class="o-grid__item c-pin__body -newscard">
+                <a href=""
+                   class="c-pin__link" id="link_url2" onclick="
+                var aba_click = {};
+                aba_click['adId']=7;
+                var abarequest = new XMLHttpRequest();
+                abarequest.open('POST', 'https://api.truffle.one/abaclick', true);
+                abarequest.setRequestHeader('Content-Type', 'application/json');
+                abarequest.send(JSON.stringify(aba_click));">
+                    <div class="u-color-mute u-text-extrasmall u-gap-bottom-small">Anzeige</div>
+                    <h3 class="c-pin__headline" id="c-pin__headline"></h3>
+                    <p id="textarea"></p>
+                </a>
+            </div>
+        </div>
+    </article>
+</div>
+<!--mobile design-->
+<div id="a2">
+    <article class="c-pin tg-articletype-sponsored-post" id="t2nativeAd">
+
+        <div class="o-grid">
+            <div class="c-pin__image">
+                <a href="" id="link_url3"
+                   onclick="
+                var aba_click = {};
+                aba_click['adId']=7;
+                var abarequest = new XMLHttpRequest();
+                abarequest.open('POST', 'https://api.truffle.one/abaclick', true);
+                abarequest.setRequestHeader('Content-Type', 'application/json');
+                abarequest.send(JSON.stringify(aba_click));">
+                    <img data-src="" id="truffleone_img2" src="" width="200" height="167" alt="" title=""
+                         class="loaded" data-was-processed="true">
+                    <noscript id="myElement2">
+                        <img src="" width="200" height="167" alt="" title=""/>
+                    </noscript>
+                </a>
+            </div>
+            <div class="o-grid__item c-pin__body -newscard">
+                <a href=""
+                   class="c-pin__link" id="link_url4" onclick="
+                var aba_click = {};
+                aba_click['adId']=7;
+                var abarequest = new XMLHttpRequest();
+                abarequest.open('POST', 'https://api.truffle.one/abaclick', true);
+                abarequest.setRequestHeader('Content-Type', 'application/json');
+                abarequest.send(JSON.stringify(aba_click));">
+                    <div class="u-color-mute u-text-extrasmall u-gap-bottom-small">Anzeige</div>
+                    <h3 class="c-pin__headline" id="c-pin__headline2"></h3>
+                    <p id="textarea3"></p>
+                </a>
+            </div>
+        </div>
+    </article>
+</div>
+
+<!--create modal for advertise ###########################-->
+<div id="advertiseModel" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add advertise</h4>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="adId" style="display:none;">
+                        <input type="text" class="form-control" id="advertiseName" placeholder="advertise">
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="btnAdd" onclick="addAdvertise()">Save</button>
+                <button type="button" class="btn btn-default" id="btnUpdate" onclick="updateAdvertise()">Update</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--create modal for campaign ###########################3-->
+<div id="campaignModel" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add campaign</h4>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <!--                        <input type="text" class="form-control" id="campaignId" style="display:none;">-->
+                        <input type="text" class="form-control" id="campaignName" placeholder="campaign">
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="campAdd" onclick="addCampaign();">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--create modal t3nContent page-->
+<div id="t3nModel" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">T3n content page</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <textarea id="showContentText" class="form-control" rows="20">example text</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+<script src="../static/js/advertiser.js"></script>
+
+{% endblock %}

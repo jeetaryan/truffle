@@ -1,0 +1,362 @@
+{% extends 'navigation.html'%}
+{% block title%} Content score definition {% endblock %}
+{% block body %}
+
+
+{% set dict_josgType= ["Identify", "Qualify"] %}
+
+
+
+
+<table  class="t1table tableFitsContent table nowrap t1alignTop">
+    <thead>
+        <tr class="headerRow">
+
+            <th class="minFormNowrap">JobOffer Search Group</th>
+            <th class="fitNowrap">Typ</th>
+            <th class="fitNowrap"></th>
+            <th class="minFormNowrap">Search Terms</th>
+        </tr>
+    </thead>
+
+
+    <tbody id="searchGroups">
+        {% for sg in josgs %}
+        <tr id="josg{{sg.dbId}}" >
+            <td class="minFormNowrap">
+                <span id="josg{{sg.dbId}}_name_text">{{sg.name}}</span>
+                <input id="josg{{sg.dbId}}_name_input" type="text" class="form-control" value="{{sg.name}}" style="display:none">
+            </td>
+
+            <td class="minFormNowrap">
+                <span id="josg{{sg.dbId}}_type_text">{{dict_josgType[sg.type]}}</span>
+                    <div class="form-group" ><select class="form-control"  id="josg{{sg.dbId}}_type_select"  style="display:none">
+                    {% for c in dict_josgType %}
+                        <option value={{loop.index-1}}>{{c}}</option>
+                    {% endfor %}
+                </select></div>
+            </td>
+            <td>
+                <a id="josg{{sg.dbId}}_delete" class="deleteJosg"><i josg="{{sg.dbId}}" class="fa fa-trash" aria-hidden="true"></i></a>
+                <a id="josg{{sg.dbId}}_edit" class="editJosg"><i josg="{{sg.dbId}}"  class="fa fa-pencil" aria-hidden="true"></i></a>
+                <a id="josg{{sg.dbId}}_cancelEdit" class="cancelEditJosg" style="display:none"><i josg={{sg.dbId}} class="fa fa-times" aria-hidden="true"></i></a>
+                <a id="josg{{sg.dbId}}_save" class="saveJosg" style="display:none"><i josg={{sg.dbId}} class="fa fa-check" aria-hidden="true"></i></a>
+            </td>
+            <td class="minFormNowrap">
+                <table id="josg{{sg.dbId}}_jos" class="t1table tableFitsContent table nowrap t1noMargins t1alignTop">
+                    {% for s in sg.jobOfferSearches %}
+                    <tr id="jos{{s.dbId}}" >
+                        <td class="minFormNowrap">
+                            <span id="jos{{s.dbId}}_keyword_text">{{s.keyword}}</span>
+                            <input id="jos{{s.dbId}}_keyword_input" type="text" class="form-control" value ="{{s.keyword}}" style="display:none">
+                        </td>
+                        <td>
+                            <a id="jos{{s.dbId}}_delete" class="deleteJos"><i jos={{s.dbId}} class="fa fa-trash" aria-hidden="true"></i></a>
+                            <a id="jos{{s.dbId}}_edit" class="editJos"><i jos={{s.dbId}} class="fa fa-pencil" aria-hidden="true"></i></a>
+                            <a id="jos{{s.dbId}}_cancelEdit" class="cancelEditJos" style="display:none"><i jos={{s.dbId}} class="fa fa-times" aria-hidden="true"></i></a>
+                            <a id="jos{{s.dbId}}_save" class="saveJos" style="display:none"><i jos={{s.dbId}} class="fa fa-check" aria-hidden="true"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="josg{{sg.dbId}}_jos_new" >
+                        <td class="minFormNowrap" >
+                            <input id="josg{{sg.dbId}}_jos_new_keyword" type="text" class="form-control" name="" value ="">
+                        </td>
+                        <td>
+                            <a id="josg{{sg.dbId}}_jos_new_add" class="addJos"><i josg={{sg.dbId}} class="fa fa-plus" aria-hidden="true"></i></a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr id="josg_new" >
+            <td class="minFormNowrap" >
+                <input id="josg_new_name" type="text" class="form-control" name="" value ="">
+            </td>
+            <td class="minFormNowrap"><div class="form-group"><select class="form-control"  id="josg_new_type">
+                {% for c in dict_josgType %}
+                    <option value={{loop.index-1}}>{{c}}</option>
+                {% endfor %}
+                </select></div>
+            </td>
+
+            <td>
+                <a id="josg_new_add" class="addJosg"><i class="fa fa-plus" aria-hidden="true"></i></a>
+            </td>
+            <td class="minFormNowrap"></td>
+        </tr>
+
+    </tbody>
+</table>
+
+
+
+
+
+<script language="javascript" type ="text/javascript">
+
+    const josgTypes = ["Identify", "Qualify"];
+
+    function addJosg() {
+        josgName = $('#josg_new_name').val()
+        josgType = $('#josg_new_type').val()
+        $.ajax({
+            url:'/addJosg',
+            type:'post',
+            data: JSON.stringify({josgName: josgName, josgType: josgType}),
+            contentType: "application/json; charset=utf-8",
+            success:function(result){
+                var json = $.parseJSON(result);
+                josgId = json.josgId
+
+                newRow = `<tr id="josg`+josgId+`">
+                        <td class="minFormNowrap">
+                            <span id="josg`+josgId+`_name_text">`+josgName+`</span>
+                            <input id="josg`+josgId+`_name_input" type="text" class="form-control" value="`+josgName+`" style="display:none">
+                        </td>
+                        <td class="minFormNowrap">
+                            <span id="josg`+josgId+`_type_text">`+josgTypes[josgType]+`</span>
+                                <div class="form-group" ><select class="form-control"  id="josg`+josgId+`_type_select"  style="display:none">
+                                    <option value=0>Identify</option>
+                                    <option value=1>Qualify</option>
+                            </select></div>
+                        </td>
+                        <td>
+                            <a id="josg`+josgId+`_delete" class="deleteJosg"><i josg="`+josgId+`" class="fa fa-trash" aria-hidden="true"></i></a>
+                            <a id="josg`+josgId+`_edit" class="editJosg"><i josg="`+josgId+`"  class="fa fa-pencil" aria-hidden="true"></i></a>
+                            <a id="josg`+josgId+`_cancelEdit" class="cancelEditJosg" style="display:none"><i josg="`+josgId+`" class="fa fa-times" aria-hidden="true"></i></a>
+                            <a id="josg`+josgId+`_save" class="saveJosg" style="display:none"><i josg="`+josgId+`"  class="fa fa-check" aria-hidden="true"></i></a>
+                        </td>
+                        <td class="minFormNowrap">
+                            <table id="josg`+josgId+`_jos" class="t1table tableFitsContent table nowrap t1noMargins t1alignTop">
+                                <tr id="josg`+josgId+`_jos_new" >
+                                    <td class="minFormNowrap" >
+                                        <input id="josg`+josgId+`_jos_new_keyword" type="text" class="form-control" value ="">
+                                    </td>
+                                    <td>
+                                        <a id="josg`+josgId+`_jos_new_add" class="addJos"><i josg=`+josgId+` class="fa fa-plus" aria-hidden="true"></i></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>`
+
+
+                $('#josg_new').before(newRow)
+                $('#josg'+josgId+'_type_select').val(josgType)
+                $('#josg'+josgId+'_type_text').val(josgType)
+                rebind();
+                $('#josg_new_name').val("")
+            }
+        });
+    }
+
+    function editJosg(josgId){
+        $('#josg'+josgId+'_edit').hide()
+        $('#josg'+josgId+'_name_text').hide()
+        $('#josg'+josgId+'_type_text').hide()
+
+        $('#josg'+josgId+'_name_input').show()
+        $('#josg'+josgId+'_type_select').val($('#josg'+josgId+'_type_text').val())
+        $('#josg'+josgId+'_type_select').show()
+        $('#josg'+josgId+'_cancelEdit').show()
+        $('#josg'+josgId+'_save').show()
+    }
+
+    function cancelEditJosg(josgId){
+        $('#josg'+josgId+'_name_input').val($('#josg'+josgId+'_name_text').text())
+        $('#josg'+josgId+'_name_input').hide()
+        $('#josg'+josgId+'_type_select').val($('#josg'+josgId+'_type_text').val())
+        $('#josg'+josgId+'_type_select').hide()
+        $('#josg'+josgId+'_cancelEdit').hide()
+        $('#josg'+josgId+'_save').hide()
+
+        $('#josg'+josgId+'_name_text').show()
+        $('#josg'+josgId+'_type_text').show()
+        $('#josg'+josgId+'_edit').show()
+    }
+
+    function saveJosg(josgId) {
+        josgName = $('#josg'+josgId+'_name_input').val()
+        josgType = $('#josg'+josgId+'_type_select').val()
+
+        $.ajax({
+            url:'/editJosg',
+            type:'post',
+            data: JSON.stringify({josgId: josgId, josgName: josgName, josgType: josgType}),
+            contentType: "application/json; charset=utf-8",
+            success:function(result){
+                $('#josg'+josgId+'_name_text').text(josgName)
+                $('#josg'+josgId+'_type_text').val(josgType)
+                $('#josg'+josgId+'_type_text').text(josgTypes[josgType])
+
+                $('#josg'+josgId+'_name_input').hide()
+                $('#josg'+josgId+'_type_select').hide()
+                $('#josg'+josgId+'_cancelEdit').hide()
+                $('#josg'+josgId+'_save').hide()
+
+                $('#josg'+josgId+'_name_text').show()
+                $('#josg'+josgId+'_type_text').show()
+                $('#josg'+josgId+'_edit').show()
+            }
+        });
+    }
+
+    function deleteJosg(josgId){
+        $.ajax({
+            url:'/deleteJosg',
+            type:'post',
+            data: JSON.stringify({josgId: josgId}),
+            contentType: "application/json; charset=utf-8",
+            success:function(result){
+                $('#josg'+josgId).remove();
+            }
+        });
+    }
+
+
+////////////////////////////////////
+
+    function addJos(josgId) {
+
+        josKeyword = $('#josg'+josgId+'_jos_new_keyword').val()
+
+        $.ajax({
+            url:'/addJos',
+            type:'post',
+            data: JSON.stringify({josKeyword: josKeyword, josgId: josgId}),
+            contentType: "application/json; charset=utf-8",
+            success:function(result){
+                var json = $.parseJSON(result);
+                josId = json.josId
+
+                newRow = `<tr id="jos`+josId+`" >
+                        <td class="minFormNowrap" >
+                            <span id="jos`+josId+`_keyword_text">`+josKeyword+`</span>
+                            <input id="jos`+josId+`_keyword_input" type="text" class="form-control" value ="`+josKeyword+`"  style="display:none">
+                        </td>
+
+                        <td>
+                            <a id="jos`+josId+`_delete" class="deleteJos"><i jos=`+josId+` class="fa fa-trash" aria-hidden="true"></i></a>
+                            <a id="jos`+josId+`_edit" class="editJos"><i jos=`+josId+` class="fa fa-pencil" aria-hidden="true"></i></a>
+                            <a id="jos`+josId+`_cancelEdit" class="cancelEditJos" style="display:none"><i jos=`+josId+` class="fa fa-times" aria-hidden="true"></i></a>
+                            <a id="jos`+josId+`_save" class="saveJos"  style="display:none"><i jos=`+josId+` class="fa fa-check" aria-hidden="true"></i></a>
+                        </td>
+                    </tr>
+                `
+
+                $('#josg'+josgId+'_jos_new').before(newRow)
+                rebind();
+
+                $('#josg'+josgId+'_jos_new_keyword').val("")
+            }
+        });
+    }
+
+    function editJos(josId){
+        $('#jos'+josId+'_edit').hide()
+        $('#jos'+josId+'_keyword_text').hide()
+
+        $('#jos'+josId+'_keyword_input').show()
+        $('#jos'+josId+'_cancelEdit').show()
+        $('#jos'+josId+'_save').show()
+    }
+
+    function cancelEditJos(josId){
+        $('#jos'+josId+'_keyword_input').val($('#jos'+josId+'_keyword_text').text())
+        $('#jos'+josId+'_keyword_input').hide()
+        $('#jos'+josId+'_cancelEdit').hide()
+        $('#jos'+josId+'_save').hide()
+
+        $('#jos'+josId+'_keyword_text').show()
+        $('#jos'+josId+'_edit').show()
+    }
+
+
+    function saveJos(josId) {
+        josKeyword = $('#jos'+josId+'_keyword_input').val()
+
+        $.ajax({
+            url:'/editJos',
+            type:'post',
+            data: JSON.stringify({josId: josId, josKeyword: josKeyword}),
+            contentType: "application/json; charset=utf-8",
+            success:function(result){
+                $('#jos'+josId+'_keyword_input').hide()
+                $('#jos'+josId+'_cancelEdit').hide()
+                $('#jos'+josId+'_save').hide()
+
+
+                $('#jos'+josId+'_keyword_text').text(josKeyword)
+                $('#jos'+josId+'_keyword_text').show()
+                $('#jos'+josId+'_edit').show()
+            }
+        });
+    }
+
+
+    function deleteJos(josId){
+        $.ajax({
+            url:'/deleteJos',
+            type:'post',
+            data: JSON.stringify({josId: josId}),
+            contentType: "application/json; charset=utf-8",
+            success:function(result){
+                $('#jos'+josId).remove();
+            }
+        });
+    }
+
+    function rebind(){
+        $('.addJosg').unbind( "click" );
+        $('.deleteJosg').unbind( "click" );
+        $('.editJosg').unbind( "click" );
+        $('.cancelEditJosg').unbind( "click" );
+        $('.saveJosg').unbind( "click" );
+        $('.addJos').unbind( "click" );
+        $('.deleteJos').unbind( "click" );
+        $('.editJos').unbind( "click" );
+        $('.cancelEditJos').unbind( "click" );
+        $('.saveJos').unbind( "click" );
+
+        $('.addJosg').click(function(e){
+            addJosg();
+        });
+        $('.deleteJosg').click(function(e){
+            deleteJosg($(event.target).attr("josg"))
+        });
+        $('.editJosg').click(function(e){
+            editJosg($(event.target).attr("josg"))
+        });
+        $('.cancelEditJosg').click(function(e){
+            cancelEditJosg($(event.target).attr("josg"))
+        });
+        $('.saveJosg').click(function(e){
+            saveJosg($(event.target).attr("josg"))
+        });
+
+        $('.addJos').click(function(e){
+            addJos($(event.target).attr("josg"))
+        });
+        $('.deleteJos').click(function(e){
+            deleteJos($(event.target).attr("jos"))
+        });
+        $('.editJos').click(function(e){
+            editJos($(event.target).attr("jos"))
+        });
+        $('.cancelEditJos').click(function(e){
+            cancelEditJos($(event.target).attr("jos"))
+        });
+        $('.saveJos').click(function(e){
+            saveJos($(event.target).attr("jos"))
+        });
+    }
+
+
+    $( document ).ready(function() {
+        rebind()
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Registrieren für Account Based Marketing{% endblock %}
+
+{% block body %}
+<div class="d-flex align-items-center justify-content-md-center vh-100">
+    <div class="container t1-dialogbox">
+
+        <div class="row mb-5">
+            <img src="/static/images/logo.svg" alt="truffle.one Account Based Marketing" class="t1-logo">
+        </div>
+        <div class="row mb-5">
+            <h1>Jetzt mit Account Based Marketing starten</h1>
+        </div>
+
+        <form action="{{url_for('register')}}" method="post" enctype="multipart/form-data" class="t1-validate-form" id="registrationForm">
+            <div class="mb-3 form-group">
+                <label for="username" class="form-label">Email-Addresse</label>
+                <input type="email" class="form-control t1-validate" id="username" name="username" validation-msg="emailHelp">
+                <div id="emailHelp" class="validation_msg text-warning">Bitte geben Sie Ihre geschäftliche Email-Adresse an.</div>
+                {% if pre_reg != '' %}<div class="text-warning">{{pre_reg}}</div>{% endif %}
+            </div>
+            <div class="mb-5 form-check">
+                <input type="checkbox" class="form-check-input t1-validate" id="tandc" name="tandc" validation-msg="tandcHelp">
+                <label class="_form-check-label" for="tandc">
+                    Im Namen meines Unternehmens akzeptiere ich die AGB und
+                    <a href="https://www.truffle.one/about-account-based-marketing-agentur/datenschutzerklaerung-2/">Datenschutzbedingungen.</a></label>
+                <div id="tandcHelp" class="validation_msg text-warning">Diese Checkbox muss aktiviert werden.</div>
+            </div>
+            <div class="row">
+                <div class="col"><button type="submit" class="btn btn-primary"  id="login">Mit ABM starten</button></div>
+                <div class="col"><a href="/">Zurück zum Login</a></div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

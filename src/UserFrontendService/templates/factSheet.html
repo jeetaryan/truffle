@@ -1,0 +1,382 @@
+{% extends 'navigation.html'%}
+{% block title%}Company Factsheet{% endblock %}
+{% block body %}
+
+
+
+
+{% if companyLogo is not none %}
+<img height="100" src="https://{{companyLogo}}">
+{% endif %}
+
+<h1>{{companyName}}</h1>
+
+<div class="container-fluid">
+<div class="row">
+<div class="col-4">
+{% if firmographics is not none %}
+    <h2>Unternehmensdaten</h2>
+    <table id="firmographics{{companyId}}" class="t1table  table ">
+        <thead>
+        <tr>
+            <th></th>
+            <th class="strongBorderLeft"></th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr><td>Mitarbeiter</td><td class="strongBorderLeft">{{firmographics.employees_0}} - {{firmographics.employees_1}}</td></tr>
+            <tr><td>Umsatz</td><td class="strongBorderLeft">{{firmographics.revenue_0}} - {{firmographics.revenue_1}}</td></tr>
+            <tr><td>Branche</td><td class="strongBorderLeft">{{firmographics.industry}}</td></tr>
+            <tr><td>Unternehmenstyp</td><td class="strongBorderLeft">{{firmographics.companyType}}</td></tr>
+            <tr><td>Gründungsjahr</td><td class="strongBorderLeft">{{firmographics.foundingYear}}</td></tr>
+        </tbody>
+    </table>
+{% endif %}
+{% if contactData is not none %}
+    <h2>Unternehmenskontakte</h2>
+    <table id="contactData{{companyId}}" class="t1table tableFitsContent table nowrap">
+        <thead>
+        <tr>
+            <th></th>
+            <th class="strongBorderLeft"></th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr><td>Telefon</td><td class="strongBorderLeft">{{contactData.phone}}</td></tr>
+            <tr><td>Email</td><td class="strongBorderLeft">{{contactData.email}}</td></tr>
+            <tr><td>Twitter</td><td class="strongBorderLeft">{{contactData.twitter}}</td></tr>
+            <tr><td>Facebook</td><td class="strongBorderLeft">{{contactData.facebook}}</td></tr>
+        </tbody>
+    </table>
+{% endif %}
+{% if segmentData is not none %}
+        <h2>Segment-Information</h2>
+{% if segmentData|length > 0 %}
+    <table id="segments{{companyId}}" class="t1table  table ">
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for segment in segmentData %}
+        <tr id="segment_company_assignment_{{segment.id}}">
+            <td><div style="width:20px;height:20px;background-color:#{{segment.colorCode}};"></div></td>
+            <td>{{segment.name}}</td>
+        </tr>
+        {% endfor %}
+            </tbody>
+    </table>
+
+    {% else %}
+    Unternehmen ist keinem Segment zugeordnet
+    {% endif %}
+{% endif %}
+
+{% if sourcesData is not none %}
+    <h2>Account-Quellen</h2>
+    {% if sourcesData|length > 0 %}
+    <table id="sources{{companyId}}" class="t1table  table ">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Quelle</th>
+        </tr>
+        </thead>
+        <body>
+
+        {% for source in sourcesData %}
+        <tr>
+            <td><div style="width:20px;height:20px;background-color:#{{source.colorCode}};"></div></td>
+            <td>{{source.name}}</td>
+        </tr>
+        {% endfor %}
+        </body>
+    </table>
+    {% else %}Fehler
+    {% endif %}
+{% endif %}
+</div>
+
+<div class="col-4">
+{% if financeData is not none %}
+    <h2>Finanzdaten</h2>
+    <table id="financeData{{companyId}}" class="t1table  table ">
+        <thead>
+        <tr>
+            <th></th>
+            <th class="strongBorderLeft"></th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr><td>Crunchbase Rank</td><td class="strongBorderLeft">{{financeData.crunchBaseRank}}</td></tr>
+            <!--<tr><td>Funding Data</td><td class="strongBorderLeft">{{financeData.funding_data}}</td></tr>-->
+            <tr><td>Anzahl Funding-Runden</td><td class="strongBorderLeft">{{financeData.fundingRoundsCount}}</td></tr>
+            <tr><td>Gesamt Funds Raised</td><td class="strongBorderLeft">{{financeData.totalfundRaised}}</td></tr>
+            <tr><td>Anzahl Investoren</td><td class="strongBorderLeft">{{financeData.investorsCount}}</td></tr>
+            <tr><td>Gesamt Lead-Investoren</td><td class="strongBorderLeft">{{financeData.leadInvestorsCount}}</td></tr>
+            <tr><td>Anzahl Investitionen</td><td class="strongBorderLeft">{{financeData.investmentsCount}}</td></tr>
+            <tr><td>Anzahl Lead-Investitionen</td><td class="strongBorderLeft">{{financeData.leadInvestmentsCount}}</td></tr>
+            <!--<tr><td>Exit-Data</td><td class="strongBorderLeft">{{financeData.exit_data}}</td></tr>-->
+            <tr><td>Anzahl Exits</td><td class="strongBorderLeft">{{financeData.exitsCount}}</td></tr>
+            <tr><td>Anzahl Akquisitionen</td><td class="strongBorderLeft">{{financeData.acquisitionsCount}}</td></tr>
+            <tr><td>Akquisitionen</td><td class="strongBorderLeft">{{financeData.acquisitions}}</td></tr>
+            <tr><td>IPO Status</td><td class="strongBorderLeft">{{financeData.ipoStatus}}</td></tr>
+            <tr><td>IPO Datum</td><td class="strongBorderLeft">{{financeData.ipoDate}}</td></tr>
+            <tr><td>Börsenzeichen</td><td class="strongBorderLeft">{{financeData.stockSymol}}</td></tr>
+        </tbody>
+    </table>
+{% endif %}
+</div>
+
+<div class="col-4">
+{% if linkedinData is not none %}
+    <h2>Linkedin-Firmendetails</h2>
+    <table id="linkedinData{{companyId}}" class="t1table table">
+        <thead>
+        <tr>
+            <th></th>
+            <th class="strongBorderLeft"></th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr><td>Linkedin-Profil</td><td class="strongBorderLeft">{{linkedinData.profileUrl}}</td></tr>
+            <tr><td>Linkedin Numeric ID</td><td class="strongBorderLeft">{{linkedinData.numericId}}</td></tr>
+            <tr><td>Linkedin String ID</td><td class="strongBorderLeft">{{linkedinData.stringId}}</td></tr>
+            <tr><td>Anzahl Follower</td><td class="strongBorderLeft">{{linkedinData.followerCount}}</td></tr>
+            <tr><td>Anzahl Mitarbeiter auf Linkedin</td><td class="strongBorderLeft">{{linkedinData.employeesOnLinkedin}}</td></tr>
+            <tr><td>Beschreibung</td><td class="strongBorderLeft">{{linkedinData.description}}</td></tr>
+            <tr><td>Tagline</td><td class="strongBorderLeft">{{linkedinData.tagline}}</td></tr>
+            <tr><td>Kategorien</td><td class="strongBorderLeft">{{linkedinData.categories}}</td></tr>
+            <tr><td>Spezialitäten</td><td class="strongBorderLeft">{{linkedinData.specialties}}</td></tr>
+            <!--tr><td>Updates</td><td class="strongBorderLeft">{{linkedinData.updates}}</td></tr>
+            <<tr><td>ProfilePicUrl</td><td class="strongBorderLeft">{{linkedinData.profilePicUrl}}</td></tr>
+            <tr><td>BackgroundCoverUrl</td><td class="strongBorderLeft">{{linkedinData.backgroundCoverUrl}}</td></tr>
+            <tr><td>Ähnliche Unternehmen</td><td class="strongBorderLeft">{{linkedinData.similarCompanies}}</td></tr>-->
+        </tbody>
+    </table>
+{% endif %}
+</div>
+</div>
+
+
+
+
+
+
+{% if visitData is not none %}
+<div class="row mt-5"><div class="col">
+    <h2>Website-Besuche</h2>
+    <table id="visits{{companyId}}" class="t1table table nowrap">
+        <thead>
+        <tr>
+            <th>Besuch</th>
+            <th>Besuchte Seite</th>
+            <th>Dauer</th>
+            <th>Scrolltiefe</th>
+            <th>Referrer</th>
+            <th>Source</th>
+            <th>Medium</th>
+            <th>Campaign</th>
+            <th>Term</th>
+            <th>Content</th>
+            <th>Gclid</th>
+            <th>Parameters</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in visitData %}
+        <tr>
+            <td id="detailsLastvisit">
+                {{item[0]}}
+            </td>
+            <td><a href=https://{{item[1]}} target=new>{{item[1]}}</a></td>
+            <td>{%if item[2] is none %}unknown
+                {% else %}{{item[2]|hrsminsec}}
+                {% endif %}
+            </td>
+            <td>{{item[3]}} %</td>
+            <td>{{item[10]}}</td>
+            <td>{{item[4]}}</td>
+            <td>{{item[5]}}</td>
+            <td>{{item[6]}}</td>
+            <td>{{item[7]}}</td>
+            <td>{{item[8]}}</td>
+            <td>{{item[9]}}</td>
+            <td>{{item[11]}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div></div>
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+    var table = $('#visits{{companyId}}').DataTable( {
+      dom: 'lBftip',
+      responsive: false,
+	  "thousands": ".",
+	  "decimals": ",",
+	  "columnDefs": [
+	    { "className": 'dt-body-right', "targets": [3]},
+	    { render: $.fn.dataTable.render.ellipsis( 30 ), targets: [4]},
+	    { render: $.fn.dataTable.render.ellipsis( 15 ), targets: [5,6,7,8,9,10,11]},
+	  ],
+	  colReorder: true,
+	  order: [[5, 'desc']],
+	  "language": {
+	    "thousands": ".",
+	    "decimals": ","
+	  },
+	  buttons: [
+		    'copy',
+		    {
+                extend: 'excelHtml5',
+                title: 'truffle.one'
+            },
+            'colvis',
+            {
+	            extend: 'searchBuilder',
+	            config: {
+	                text: "complex search"
+	            }
+            }
+      ]
+    } );
+
+    new $.fn.dataTable.FixedHeader( table );
+} );
+</script>
+{% endif %}
+
+
+{% if websites is not none %}
+    <div class="row mt-5"><div class="col">
+    <h2>Websites</h2>
+    <table id="websites{{companyId}}" class="t1table  table ">
+        <thead>
+        <tr>
+            {% for website in websites %}
+            <th>{{website.website}}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for website in websites %}
+                <td><img src=https://login.truffle.one/static/screenshots/{{website.dbId}}.png width=320px></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for website in websites %}
+                <td>keine passenden ContentScores</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div></div>
+{% endif %}
+
+{% if joboffers is not none %}
+<div class="row mt-5"><div class="col">
+<h2>Stellenausschreibungen</h2>
+Keine auf Stellenausschreibung passend zu Suchmuster
+</div></div>
+{% endif %}
+
+<!--
+{% if firmographics is not none %}
+<div class="row mt-5"><div class="col">
+    <h2>Branchendetails</h2>
+    <table id="industries{{companyId}}" class="t1table tableFitsContent table nowrap">
+        <thead>
+        <tr>
+            <th></th>
+            <th class="strongBorderLeft">SIC</th>
+            <th>NAICS</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr><td>Branchencode</td><td class="strongBorderLeft">{{firmographics.sicCode}}</td><td>{{firmographics.naicsCode}}</td></tr>
+            <tr><td>Bezeichnung</td><td class="strongBorderLeft">{{firmographics.sicLabelDe}}</td><td>{{firmographics.naicsLabelEn}}</td></tr>
+            <tr><td>Level 1</td><td class="strongBorderLeft">{{firmographics.sicCatLevelDe1}}</td><td>{{firmographics.naicsCatLevelEn1}}</td></tr>
+            <tr><td>Level 2</td><td class="strongBorderLeft">{{firmographics.sicCatLevelDe2}}</td><td>{{firmographics.naicsCatLevelEn2}}</td></tr>
+            <tr><td>Level 3</td><td class="strongBorderLeft">{{firmographics.sicCatLevelDe3}}</td><td>{{firmographics.naicsCatLevelEn3}}</td></tr>
+            <tr><td>Level 4</td><td class="strongBorderLeft">{{firmographics.sicCatLevelDe4}}</td><td>{{firmographics.naicsCatLevelEn4}}</td></tr>
+            <tr><td>Level 5</td><td class="strongBorderLeft">{{firmographics.sicCatLevelDe5}}</td><td>{{firmographics.naicsCatLevelEn5}}</td></tr>
+            <tr><td>Level 6</td><td class="strongBorderLeft">{{firmographics.sicCatLevelDe6}}</td><td>{{firmographics.naicsCatLevelEn6}}</td></tr>
+        </tbody>
+    </table>
+</div></div>
+{% endif %}
+
+
+
+{% if technographicsData is not none %}
+<div class="row mt-5"><div class="col">
+    <table id="technographics_table" class="t1table table nowrap">
+        <h2>Weitere Infos</h2>
+
+        <thead>
+        <tr>
+            <th>Site Id</th>
+            <th>Company Id</th>
+            <th>Source</th>
+            <th>Website</th>
+            <th>Zip</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Profile LK</th>
+            <th>Profile TW</th>
+            <th>Profile FB</th>
+            <th>Profile Xing</th>
+            <th>Profile YT</th>
+            <th>Profile TT</th>
+            <th>Profile TWI</th>
+            <th>Technographic check</th>
+            <th>Last modified on</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% if technographicsData != '0' %}
+        {% for data in technographicsData %}
+
+        <tr>
+            <td>{{data[0]}}</td>
+            <td>{{data[1]}}</td>
+            {% if data[2] == 0 %}
+            <td>Manual</td>
+            {% elif data[2] == 1 %}
+            <td>Kickfire</td>
+            {% elif data[2] == 2 %}
+            <td>Proxycurl</td>
+            {% elif data[2] == 3 %}
+            <td>Clearbit</td>
+            {% endif %}
+            <td>{{data[3]}}</td>
+            <td>{{data[4]}}</td>
+            <td>{{data[5]}}</td>
+            <td>{{data[6]}}</td>
+            <td>{{data[7]}}</td>
+            <td>{{data[8]}}</td>
+            <td>{{data[9]}}</td>
+            <td>{{data[10]}}</td>
+            <td>{{data[11]}}</td>
+            <td>{{data[12]}}</td>
+            <td>{{data[13]}}</td>
+            <td>{{data[14]}}</td>
+            <td>{{data[16]}}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div></div>
+{% endif %}
+-->
+</div>
+{% endblock %}

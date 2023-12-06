@@ -1,0 +1,64 @@
+{% extends 'navigation.html'%}
+{% block title%} Content score definition {% endblock %}
+{% block body %}
+
+
+
+
+
+<div class="form-floating mb-3">
+    <input type="text" class="form-control" id="first_name" value="{{session['user'].firstName}}" name="first_name">
+    <label for="first_name">Vorname</label>
+    <span id="validate_f_name" class="validation_msg profile_span">Vorname</span>
+</div>
+<div class="form-floating mb-3">
+    <input type="text" class="form-control" name="last_name" id="last_name" value="{{session['user'].lastName}}">
+    <label for="last_name">Nachname</label>
+    <span id="validate_l_name" class="validation_msg profile_span"> Nachname.</span>
+
+</div>
+<div class="form-floating mb-3">
+    <select class="form-control" id="gender" name="gender" value="{{session['user'].gender}}">
+        <option value="0" {% if session['user'].gender == 0 %}selected{% endif %}>männlich</option>
+        <option value="1" {% if session['user'].gender == 1 %}selected{% endif %}>weiblich</option>
+        <option value="2" {% if session['user'].gender == 2 %}selected{% endif %}>divers</option>
+    </select>
+    <label for="gender">Geschlecht</label>
+    <span id="validate_gender" class="validation_msg profile_span"> Wie möchten Sie angesprochen werden?</span>
+</div>
+<div class="form-floating mb-3">
+    <select class="form-control" id="language" name="language">
+        <option value="0" {% if session['user'].language == 0 %}selected{% endif %}>English</option>
+        <option value="1" {% if session['user'].language == 1 %}selected{% endif %}>Deutsch</option>
+    </select>
+    <label for="language">Nachname</label>
+    <span id="validate_language" class="validation_msg profile_span"> Welche Sprache bevorzugen Sie?</span>
+</div>
+
+
+<div class="loginSubmit">
+    <button type="submit" name="login" id="login" class="loginSubBtn" onclick="updateProfile()">Aktualisieren</button>
+    <button name="changePw" id="changePw" onclick="window.location.href='{{url_for('resetPassword')}}';" class="loaderButton">Passwort ändern</button>
+
+</div>
+
+
+<script>
+function updateProfile(){
+
+    let emailId= $("#username").val();
+    let f_name= $("#first_name").val();
+    let l_name= $("#last_name").val();
+    let gender= $("#gender").val();
+    let language= $("#language").val();
+    $.ajax({
+         url:'/updateProfile',
+         type:'post',
+         data:{ f_name: f_name, l_name:l_name, gender:gender, language:language },
+         success:function(data){
+                    $("#profile").html(f_name + " " + l_name)
+              }
+        });
+}
+</script>
+{% endblock %}
